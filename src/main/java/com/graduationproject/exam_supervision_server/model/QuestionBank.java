@@ -25,7 +25,7 @@ public class QuestionBank {
     @JoinColumn(name = "subject_id")
     private Subject subject;
 
-    private String type;
+    private Integer type;
 
     @OneToMany(
             mappedBy = "questionBank",
