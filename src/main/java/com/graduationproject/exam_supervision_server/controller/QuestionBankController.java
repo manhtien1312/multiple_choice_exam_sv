@@ -1,5 +1,6 @@
 package com.graduationproject.exam_supervision_server.controller;
 
+import com.graduationproject.exam_supervision_server.dto.QuestionBankDto;
 import com.graduationproject.exam_supervision_server.model.QuestionBank;
 import com.graduationproject.exam_supervision_server.service.serviceinterface.QuestionBankService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,7 @@ public class QuestionBankController {
     private QuestionBankService questionBankService;
 
     @GetMapping
-    public ResponseEntity<QuestionBank> getQuestionBankBySubjectId(@RequestParam String subjectId, @RequestParam int type){
+    public ResponseEntity<QuestionBankDto> getQuestionBankBySubjectId(@RequestParam String subjectId, @RequestParam int type){
         return questionBankService.getBySubjectId(subjectId, type);
     }
 

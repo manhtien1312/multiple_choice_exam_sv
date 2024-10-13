@@ -1,10 +1,10 @@
 package com.graduationproject.exam_supervision_server.service.serviceinterface;
 
-import com.graduationproject.exam_supervision_server.model.QuestionBank;
+import com.graduationproject.exam_supervision_server.dto.QuestionBankDto;
 import org.springframework.http.ResponseEntity;
 
 public interface QuestionBankService {
 
-    ResponseEntity<QuestionBank> getBySubjectId(String id, int type);
+    ResponseEntity<QuestionBankDto> getBySubjectId(String id, int type);
 
 }
