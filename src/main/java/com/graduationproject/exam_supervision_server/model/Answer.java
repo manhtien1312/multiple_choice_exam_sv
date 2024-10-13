@@ -1,10 +1,8 @@
 package com.graduationproject.exam_supervision_server.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.UUID;
 
@@ -13,6 +11,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Getter
+@Setter
 @Table(name = "answer")
 public class Answer {
 
@@ -22,11 +22,13 @@ public class Answer {
 
     @ManyToOne
     @JoinColumn(name = "question_id")
+    @JsonIgnore
     private Question question;
 
     @Column(columnDefinition = "TEXT")
     private String answerContent;
 
-    private boolean isCorrect;
+    @Column(columnDefinition = "TINYINT(1)")
+    private Boolean isCorrect;
 
 }

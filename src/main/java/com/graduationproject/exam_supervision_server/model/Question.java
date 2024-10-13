@@ -1,5 +1,6 @@
 package com.graduationproject.exam_supervision_server.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,16 +22,23 @@ public class Question {
     @GeneratedValue
     private UUID id;
 
-    private String type;
+    private Integer type;
 
     @Column(columnDefinition = "TEXT")
     private String questionContent;
 
-    @OneToMany(mappedBy = "question")
+    @OneToMany(
+            mappedBy = "question",
+            cascade = CascadeType.ALL
+    )
     private List<Answer> answers;
+
+    @Column(columnDefinition = "TEXT")
+    private String explanation;
 
     @ManyToOne
     @JoinColumn(name = "question_bank_id")
+    @JsonIgnore
     private QuestionBank questionBank;
 
 }
