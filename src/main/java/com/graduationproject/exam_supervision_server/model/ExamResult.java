@@ -33,6 +33,7 @@ public class ExamResult {
     private Integer correctQuestions;
     private Integer wrongQuestions;
     private Integer blankQuestions;
+    private Double score;
 
     @ManyToMany(mappedBy = "examResults")
     private List<Report> reports;
