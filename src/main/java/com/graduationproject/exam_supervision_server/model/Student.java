@@ -16,7 +16,6 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @Table(name = "student")
-
 public class Student {
 
     @Id
@@ -46,5 +45,5 @@ public class Student {
     @OneToMany(mappedBy = "student")
     @JsonIgnore
     private List<ExamResult> examResults;
-	
+
 }

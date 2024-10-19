@@ -16,8 +16,8 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @Table(name = "question")
-
 public class Question {
+
     @Id
     @GeneratedValue
     private UUID id;
@@ -40,5 +40,5 @@ public class Question {
     @JoinColumn(name = "question_bank_id")
     @JsonIgnore
     private QuestionBank questionBank;
-    
+
 }

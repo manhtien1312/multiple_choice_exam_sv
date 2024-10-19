@@ -17,7 +17,6 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @Table(name = "subject")
-
 public class Subject {
 
     @Id
@@ -47,5 +46,5 @@ public class Subject {
     )
     @JsonIgnore
     private List<Exam> exams;
-	
+
 }

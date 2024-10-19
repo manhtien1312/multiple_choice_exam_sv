@@ -16,9 +16,8 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @Table(name = "class")
-
 public class Class {
-	
+
     @Id
     @GeneratedValue
     private UUID id;
@@ -48,5 +47,5 @@ public class Class {
     @OneToMany(mappedBy = "classBelonged")
     @JsonIgnore
     private List<ExamQuestion> examQuestions;
-	
+
 }

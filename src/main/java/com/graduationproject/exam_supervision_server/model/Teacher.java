@@ -16,7 +16,6 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @Table(name = "teacher")
-
 public class Teacher {
 
     @Id

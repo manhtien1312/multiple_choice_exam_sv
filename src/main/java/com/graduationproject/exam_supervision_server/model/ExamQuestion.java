@@ -15,9 +15,8 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @Table(name = "exam_question")
-
 public class ExamQuestion {
-	
+
     @Id
     @GeneratedValue
     private UUID id;
@@ -40,5 +39,5 @@ public class ExamQuestion {
     private List<Question> questions;
 
     private boolean isUsed;
-    
+
 }

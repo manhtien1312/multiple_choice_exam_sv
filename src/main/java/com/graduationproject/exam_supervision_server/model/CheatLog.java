@@ -15,8 +15,8 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @Table(name = "cheat_log")
-
 public class CheatLog {
+
     @Id
     @GeneratedValue
     private UUID id;
@@ -32,5 +32,5 @@ public class CheatLog {
     private Student student;
 
     private String cheatAction;
-    
+
 }
