@@ -134,4 +134,27 @@ public class QuestionServiceImpl implements QuestionService  {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new MessageResponse("Lỗi Server. Thử Lại Sau!"));
         }
     }
+
+
+
+
+
+    // NV Ngọc
+    @Override
+    public List<Question> getPracticeQuestionsBySubject(String subjectId) {
+//        return questionRepository.findBySubjectId(UUID.fromString(subjectId));
+        return null;
+    }
+
+    @Override
+    public boolean checkAnswer(String questionId, String selectedAnswer) {
+        Question question = questionRepository.findById(UUID.fromString(questionId)).orElseThrow();
+        return question.getAnswers().equals(selectedAnswer);
+    }
+
+    @Override
+    public String getExplanation(String questionId) {
+        Question question = questionRepository.findById(UUID.fromString(questionId)).orElseThrow();
+        return question.getExplanation();
+    }
 }

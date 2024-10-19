@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/report")
@@ -17,13 +18,13 @@ public class ReportController {
     private ExamResultServiceInterface examResultService;
 
     @GetMapping("/exam/{examId}")
-    public ResponseEntity<List<ExamResult>> getExamResults(@PathVariable Long examId) {
+    public ResponseEntity<List<ExamResult>> getExamResults(@PathVariable String examId) {
         List<ExamResult> results = examResultService.getResultsByExam(examId);
         return ResponseEntity.ok(results);
     }
 
     @GetMapping("/exam/{examId}/export")
-    public ResponseEntity<String> exportExamResults(@PathVariable Long examId) {
+    public ResponseEntity<String> exportExamResults(@PathVariable String examId) {
         try {
             examResultService.exportResultsToExcel(examId);
             return ResponseEntity.ok("Results exported successfully.");
