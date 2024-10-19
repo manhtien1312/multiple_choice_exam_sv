@@ -1,7 +1,7 @@
-package com.example.exam_supervision.controller;
+package com.graduationproject.exam_supervision_server.controller;
 
-import com.example.exam_supervision.model.PracticeQuestion;
-import com.example.exam_supervision.service.PracticeService;
+import com.graduationproject.exam_supervision_server.model.PracticeQuestion;
+import com.graduationproject.exam_supervision_server.service.serviceinterface.PracticeServiceInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,7 +13,7 @@ import java.util.List;
 public class PracticeController {
 
     @Autowired
-    private PracticeService practiceService;
+    private PracticeServiceInterface practiceService;
 
     @GetMapping("/subject/{subjectId}")
     public ResponseEntity<List<PracticeQuestion>> getPracticeQuestions(@PathVariable Long subjectId) {

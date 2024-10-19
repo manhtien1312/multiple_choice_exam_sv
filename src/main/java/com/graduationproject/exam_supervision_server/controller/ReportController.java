@@ -1,7 +1,7 @@
-package com.example.exam_supervision.controller;
+package com.graduationproject.exam_supervision_server.controller;
 
-import com.example.exam_supervision.model.ExamResult;
-import com.example.exam_supervision.service.ExamResultService;
+import com.graduationproject.exam_supervision_server.model.ExamResult;
+import com.graduationproject.exam_supervision_server.service.serviceinterface.ExamResultServiceInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +14,7 @@ import java.util.List;
 public class ReportController {
 
     @Autowired
-    private ExamResultService examResultService;
+    private ExamResultServiceInterface examResultService;
 
     @GetMapping("/exam/{examId}")
     public ResponseEntity<List<ExamResult>> getExamResults(@PathVariable Long examId) {
