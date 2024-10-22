@@ -27,8 +27,8 @@ public class QuestionController {
     }
 
     @PostMapping("/add-file")
-    public ResponseEntity<MessageResponse> addThroughFile(@RequestParam String questionBankId, @RequestParam MultipartFile questionFile){
-        return questionService.addThroughFile(questionBankId, questionFile);
+    public ResponseEntity<MessageResponse> addThroughFile(@RequestParam String subjectId, @RequestParam MultipartFile questionFile){
+        return questionService.addThroughFile(subjectId, questionFile);
     }
 
     @PutMapping("/{id}")

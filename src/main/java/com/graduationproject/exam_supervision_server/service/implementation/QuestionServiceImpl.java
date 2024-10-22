@@ -64,31 +64,93 @@ public class QuestionServiceImpl implements QuestionService  {
     }
 
     @Override
-    public ResponseEntity<MessageResponse> addThroughFile(String questionBankId, MultipartFile questionFile) {
+    public ResponseEntity<MessageResponse> addThroughFile(String subjectId, MultipartFile questionFile) {
         try {
-            QuestionBank qb = questionBankRepository.findById(UUID.fromString(questionBankId)).get();
+            QuestionBank reviewQB = questionBankRepository.findBySubjectId(UUID.fromString(subjectId), 0).get();
+            QuestionBank examQB = questionBankRepository.findBySubjectId(UUID.fromString(subjectId), 1).get();
+
             List<Answer> answers = new ArrayList<>();
 
             XSSFWorkbook workbook = new XSSFWorkbook(questionFile.getInputStream());
-            XSSFSheet sheet = workbook.getSheetAt(0);
-            for (int i=1; i<sheet.getPhysicalNumberOfRows(); i++){
-                XSSFRow row = sheet.getRow(i);
+            XSSFSheet reviewSheet = workbook.getSheetAt(0);
+            for (int i=1; i<reviewSheet.getPhysicalNumberOfRows(); i++){
+                XSSFRow row = reviewSheet.getRow(i);
+                XSSFCell idCell = row.getCell(0);
+                Question question;
 
-                var question = Question.builder()
-                        .type(row.getCell(0).getStringCellValue().trim().equals("Lý thuyết") ? 1 : 2)
-                        .questionContent(row.getCell(1).getStringCellValue().trim())
-                        .questionBank(qb)
-                        .explanation(row.getCell(7).getStringCellValue().trim())
+                if(idCell == null || idCell.getCellType() == CellType.BLANK){
+                    question = Question.builder()
+                        .type(row.getCell(1).getStringCellValue().trim().equals("Lý thuyết") ? 1 : 2)
+                        .questionContent(row.getCell(2).getStringCellValue().trim())
+                        .questionBank(reviewQB)
+                        .explanation(row.getCell(8) == null ? "" : row.getCell(8).getStringCellValue().trim())
                         .build();
-                Question savedQuestion = questionRepository.save(question);
+                    Question savedQuestion = questionRepository.save(question);
 
-                for (int j=2; j<=5; j++){
-                    var answer = Answer.builder()
-                            .question(savedQuestion)
-                            .answerContent(row.getCell(j).getStringCellValue().trim())
-                            .isCorrect((int) row.getCell(6).getNumericCellValue() + 1 == j)
+                    for (int j=3; j<=6; j++){
+                        var answer = Answer.builder()
+                                .question(savedQuestion)
+                                .answerContent(row.getCell(j).getStringCellValue().trim())
+                                .isCorrect((int) row.getCell(7).getNumericCellValue() + 2 == j)
+                                .build();
+                        answers.add(answer);
+                    }
+                }
+                else {
+                    question = questionRepository.findById(UUID.fromString(idCell.getStringCellValue().trim())).get();
+                    question.setType(row.getCell(1).getStringCellValue().trim().equals("Lý thuyết") ? 1 : 2);
+                    question.setQuestionContent(row.getCell(2).getStringCellValue().trim());
+                    question.setExplanation(row.getCell(8).getStringCellValue().trim());
+
+                    List<Answer> savedAnswers = question.getAnswers();
+                    for (int j=0; j<savedAnswers.size(); j++){
+                        savedAnswers.get(j).setAnswerContent(row.getCell(j+3).getStringCellValue().trim());
+                        savedAnswers.get(j).setIsCorrect((int) row.getCell(7).getNumericCellValue() == j+1);
+                    }
+                    question.setAnswers(savedAnswers);
+
+                    questionRepository.save(question);
+                }
+            }
+
+            XSSFSheet examSheet = workbook.getSheetAt(1);
+            for (int i=1; i<examSheet.getPhysicalNumberOfRows(); i++){
+                XSSFRow row = examSheet.getRow(i);
+                XSSFCell idCell = row.getCell(0);
+                Question question;
+
+                if(idCell == null || idCell.getCellType() == CellType.BLANK){
+                    question = Question.builder()
+                            .type(row.getCell(1).getStringCellValue().trim().equals("Lý thuyết") ? 1 : 2)
+                            .questionContent(row.getCell(2).getStringCellValue().trim())
+                            .questionBank(examQB)
+                            .explanation(row.getCell(8) == null ? "" : row.getCell(8).getStringCellValue().trim())
                             .build();
-                    answers.add(answer);
+                    Question savedQuestion = questionRepository.save(question);
+
+                    for (int j=3; j<=6; j++){
+                        var answer = Answer.builder()
+                                .question(savedQuestion)
+                                .answerContent(row.getCell(j).getStringCellValue().trim())
+                                .isCorrect((int) row.getCell(7).getNumericCellValue() + 2 == j)
+                                .build();
+                        answers.add(answer);
+                    }
+                }
+                else {
+                    question = questionRepository.findById(UUID.fromString(idCell.getStringCellValue().trim())).get();
+                    question.setType(row.getCell(1).getStringCellValue().trim().equals("Lý thuyết") ? 1 : 2);
+                    question.setQuestionContent(row.getCell(2).getStringCellValue().trim());
+                    question.setExplanation(row.getCell(8).getStringCellValue().trim());
+
+                    List<Answer> savedAnswers = question.getAnswers();
+                    for (int j=0; j<savedAnswers.size(); j++){
+                        savedAnswers.get(j).setAnswerContent(row.getCell(j+3).getStringCellValue().trim());
+                        savedAnswers.get(j).setIsCorrect((int) row.getCell(7).getNumericCellValue() == j+1);
+                    }
+                    question.setAnswers(savedAnswers);
+
+                    questionRepository.save(question);
                 }
             }
 
