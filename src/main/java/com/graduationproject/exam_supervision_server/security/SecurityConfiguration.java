@@ -42,7 +42,7 @@ public class SecurityConfiguration {
 
     private void configureCors(CorsConfigurer cors){
         CorsConfiguration corsConfiguration = new CorsConfiguration();
-        corsConfiguration.addAllowedOrigin("http://localhost:3000"); // Adjust the origin to match your frontend URL
+        corsConfiguration.addAllowedOrigin("http://localhost:5173"); // Adjust the origin to match your frontend URL
         corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
         corsConfiguration.setAllowedHeaders(List.of("*"));
         corsConfiguration.setAllowCredentials(true);
