@@ -1,6 +1,7 @@
 package com.graduationproject.exam_supervision_server.repository;
 
 import com.graduationproject.exam_supervision_server.model.Student;
+import com.graduationproject.exam_supervision_server.model.Teacher;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -18,5 +19,8 @@ public interface StudentRepository extends JpaRepository<Student, UUID> {
 
     @Query(value = "SELECT s FROM Student s WHERE s.studentCode=:studentCode")
     Optional<Student> findByStudentCode(String studentCode);
+
+    @Query(value = "SELECT s FROM Student s WHERE s.account.username=:username")
+    Optional<Student> findByAccountUsername(String username);
 
 }

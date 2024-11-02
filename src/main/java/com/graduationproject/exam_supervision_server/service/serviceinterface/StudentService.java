@@ -6,10 +6,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 public interface StudentService {
 
     ResponseEntity<MessageResponse> addStudentToClass(String classId, Student student);
     ResponseEntity<MessageResponse> addStudentToClassByFile(String classId, MultipartFile studentFile) throws IOException;
+    ResponseEntity<MessageResponse> removeStudentFromClass(String classId, List<String> selectedStudents);
 
 }

@@ -4,10 +4,10 @@ import com.graduationproject.exam_supervision_server.dto.request.LoginRequest;
 import com.graduationproject.exam_supervision_server.dto.request.SignUpRequest;
 import com.graduationproject.exam_supervision_server.dto.response.JwtTokenResponse;
 import com.graduationproject.exam_supervision_server.dto.response.MessageResponse;
-import com.graduationproject.exam_supervision_server.model.Account;
-import com.graduationproject.exam_supervision_server.model.ERole;
-import com.graduationproject.exam_supervision_server.model.Role;
+import com.graduationproject.exam_supervision_server.model.*;
 import com.graduationproject.exam_supervision_server.repository.AccountRepository;
+import com.graduationproject.exam_supervision_server.repository.StudentRepository;
+import com.graduationproject.exam_supervision_server.repository.TeacherRepository;
 import com.graduationproject.exam_supervision_server.security.JwtService;
 import com.graduationproject.exam_supervision_server.service.serviceinterface.AccountService;
 import com.graduationproject.exam_supervision_server.service.serviceinterface.RoleService;
@@ -26,6 +26,10 @@ public class AccountServiceImpl implements AccountService {
 
     @Autowired
     private AccountRepository accountRepository;
+    @Autowired
+    private TeacherRepository teacherRepository;
+    @Autowired
+    private StudentRepository studentRepository;
     @Autowired
     private RoleService roleService;
     @Autowired
@@ -89,7 +93,21 @@ public class AccountServiceImpl implements AccountService {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             Account account = accountRepository.findByUsername(request.username()).orElseThrow();
             String token = jwtService.generateToken(account);
-            return ResponseEntity.status(HttpStatus.OK).body(new JwtTokenResponse(token, account.getRole().getRoleName().name()));
+            String userFullName = "";
+            switch (account.getRole().getRoleName()){
+                case ROLE_ADMIN:
+                    userFullName = "ADMIN";
+                    break;
+                case ROLE_TEACHER:
+                    Teacher teacher = teacherRepository.findByAccountUsername(request.username()).get();
+                    userFullName = teacher.getTeacherName();
+                    break;
+                case ROLE_STUDENT:
+                    Student student = studentRepository.findByAccountUsername(request.username()).get();
+                    userFullName = student.getStudentName();
+                    break;
+            }
+            return ResponseEntity.status(HttpStatus.OK).body(new JwtTokenResponse(token, account.getRole().getRoleName().name(), userFullName));
         } catch (Exception e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponse("Thông tin đăng nhập không chính xác!"));
         }

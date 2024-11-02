@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -26,6 +27,11 @@ public class StudentController {
     @PostMapping("/add-student-file")
     public ResponseEntity<MessageResponse> addStudentByFile(@RequestParam String classId, @RequestParam MultipartFile studentFile) throws IOException {
         return studentService.addStudentToClassByFile(classId, studentFile);
+    }
+
+    @DeleteMapping("/remove-from-class")
+    public ResponseEntity<MessageResponse> removeStudentFromClass(@RequestParam String classId, @RequestBody List<String> selectedStudents){
+        return studentService.removeStudentFromClass(classId, selectedStudents);
     }
 
 }

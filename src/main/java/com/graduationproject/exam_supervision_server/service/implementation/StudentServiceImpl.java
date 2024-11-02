@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class StudentServiceImpl implements StudentService {
@@ -87,5 +88,22 @@ public class StudentServiceImpl implements StudentService {
 
         classRepository.save(classObj);
         return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponse("Thêm sinh viên thành công"));
+    }
+
+    @Override
+    public ResponseEntity<MessageResponse> removeStudentFromClass(String classId, List<String> selectedStudents) {
+        try{
+            Class classObj = classRepository.findById(UUID.fromString(classId)).get();
+            List<Student> classStudents = classObj.getStudents();
+            List<Student> updatedStudents = classStudents.stream()
+                    .filter(student -> !selectedStudents.contains(student.getId().toString()))
+                    .collect(Collectors.toList());
+            classObj.setStudents(updatedStudents);
+            classRepository.save(classObj);
+            return ResponseEntity.status(HttpStatus.OK).body(new MessageResponse("Đã xóa sinh viên khỏi lớp"));
+        } catch (Exception e){
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new MessageResponse("Lỗi "));
+        }
     }
 }

@@ -17,7 +17,7 @@ public class AuthController {
     private AccountService accountService;
 
     @PostMapping("/register-admin")
-    public ResponseEntity<MessageResponse> registerAdmnin(@RequestBody SignUpRequest request){
+    public ResponseEntity<MessageResponse> registerAdmin(@RequestBody SignUpRequest request){
         return accountService.registerAdmin(request);
     }
 
