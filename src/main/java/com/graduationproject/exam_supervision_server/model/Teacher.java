@@ -24,6 +24,8 @@ public class Teacher {
 
     private String teacherCode;
     private String teacherName;
+    private String phoneNumber;
+    private String email;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "account_id")

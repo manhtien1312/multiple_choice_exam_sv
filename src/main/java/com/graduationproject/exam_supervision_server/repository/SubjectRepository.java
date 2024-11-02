@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import javax.swing.text.html.Option;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -14,5 +16,8 @@ public interface SubjectRepository extends JpaRepository<Subject, UUID> {
     @Transactional
     @Query(value = "SELECT CASE WHEN COUNT(s) > 0 THEN true ELSE false END FROM Subject s WHERE s.subjectCode=:subjectCode")
     boolean existBySubjectCode(String subjectCode);
+
+    @Query(value = "SELECT s FROM Subject s WHERE s.subjectName=:subjectName")
+    Optional<Subject> findBySubjectName(String subjectName);
 
 }
