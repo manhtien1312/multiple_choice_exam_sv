@@ -18,14 +18,14 @@ public class QuestionMapper implements Function<Question, QuestionDto> {
     @Override
     public QuestionDto apply(Question question) {
 
-        String type = question.getType() == 1 ? "Lý thuyết" : "Vận dụng";
         List<AnswerDto> answers = question.getAnswers().stream()
                 .map(answerMapper)
                 .toList();
 
         return new QuestionDto(
                 question.getId(),
-                type,
+                question.getType().getTypeName(),
+                question.getQuestionCode(),
                 question.getQuestionContent(),
                 answers,
                 question.getExplanation()

@@ -35,7 +35,7 @@ public class Account implements UserDetails {
     @JsonIgnore
     private String password;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "role_id")
     private Role role;
 

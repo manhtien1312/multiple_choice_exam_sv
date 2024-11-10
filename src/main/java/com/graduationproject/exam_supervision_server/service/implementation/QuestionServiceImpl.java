@@ -4,9 +4,11 @@ import com.graduationproject.exam_supervision_server.dto.response.MessageRespons
 import com.graduationproject.exam_supervision_server.model.Answer;
 import com.graduationproject.exam_supervision_server.model.Question;
 import com.graduationproject.exam_supervision_server.model.QuestionBank;
+import com.graduationproject.exam_supervision_server.model.QuestionType;
 import com.graduationproject.exam_supervision_server.repository.AnswerRepository;
 import com.graduationproject.exam_supervision_server.repository.QuestionBankRepository;
 import com.graduationproject.exam_supervision_server.repository.QuestionRepository;
+import com.graduationproject.exam_supervision_server.repository.QuestionTypeRepository;
 import com.graduationproject.exam_supervision_server.service.serviceinterface.QuestionService;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.*;
@@ -27,6 +29,8 @@ public class QuestionServiceImpl implements QuestionService  {
 
     @Autowired
     private QuestionRepository questionRepository;
+    @Autowired
+    private QuestionTypeRepository questionTypeRepository;
     @Autowired
     private QuestionBankRepository questionBankRepository;
     @Autowired
@@ -49,6 +53,14 @@ public class QuestionServiceImpl implements QuestionService  {
         try {
             Optional<QuestionBank> qb = questionBankRepository.findById(UUID.fromString(questionBankId));
             question.setQuestionBank(qb.get());
+            String questionType = question.getType().getTypeName();
+            if(questionTypeRepository.existByTypeName(questionType)){
+                question.setType(questionTypeRepository.findByTypeName(questionType).get());
+            }
+            else {
+                QuestionType savedType = questionTypeRepository.save(question.getType());
+                question.setType(savedType);
+            }
             Question savedQuestion = questionRepository.save(question);
 
             List<Answer> answers = question.getAnswers();
@@ -63,6 +75,7 @@ public class QuestionServiceImpl implements QuestionService  {
         }
     }
 
+    @Transactional
     @Override
     public ResponseEntity<MessageResponse> addThroughFile(String subjectId, MultipartFile questionFile) {
         try {
@@ -75,16 +88,33 @@ public class QuestionServiceImpl implements QuestionService  {
             XSSFSheet reviewSheet = workbook.getSheetAt(0);
             for (int i=1; i<reviewSheet.getPhysicalNumberOfRows(); i++){
                 XSSFRow row = reviewSheet.getRow(i);
-                XSSFCell idCell = row.getCell(0);
-                Question question;
 
-                if(idCell == null || idCell.getCellType() == CellType.BLANK){
-                    question = Question.builder()
-                        .type(row.getCell(1).getStringCellValue().trim().equals("Lý thuyết") ? 1 : 2)
-                        .questionContent(row.getCell(2).getStringCellValue().trim())
-                        .questionBank(reviewQB)
-                        .explanation(row.getCell(8) == null ? "" : row.getCell(8).getStringCellValue().trim())
-                        .build();
+                // Xác định loại câu hỏi đã có hay chưa
+                String typeName = row.getCell(1).getStringCellValue().trim();
+                QuestionType type;
+                if(questionTypeRepository.existByTypeName(typeName)){
+                    type = questionTypeRepository.findByTypeName(typeName).get();
+                }
+                else {
+                    var newType = QuestionType.builder()
+                            .typeName(typeName)
+                            .build();
+                    type = questionTypeRepository.save(newType);
+                }
+
+                // Xác định câu hỏi đã tồn tại hay chưa, nếu rồi thì cập nhật, nếu chưa thì thêm mới
+                String questionCode = row.getCell(0).getStringCellValue().trim();
+                Optional<Question> questionOptional = questionRepository.findByQuestionCode(questionCode);
+
+                // Nếu là câu hỏi mới
+                if(questionOptional.isEmpty()){
+                    var question = Question.builder()
+                            .type(type)
+                            .questionCode(questionCode)
+                            .questionContent(row.getCell(2).getStringCellValue().trim())
+                            .questionBank(reviewQB)
+                            .explanation(row.getCell(8) == null ? "" : row.getCell(8).getStringCellValue().trim())
+                            .build();
                     Question savedQuestion = questionRepository.save(question);
 
                     for (int j=3; j<=6; j++){
@@ -96,9 +126,10 @@ public class QuestionServiceImpl implements QuestionService  {
                         answers.add(answer);
                     }
                 }
+                // Nếu câu hỏi đã tồn tại
                 else {
-                    question = questionRepository.findById(UUID.fromString(idCell.getStringCellValue().trim())).get();
-                    question.setType(row.getCell(1).getStringCellValue().trim().equals("Lý thuyết") ? 1 : 2);
+                    Question question = questionOptional.get();
+                                        question.setType(type);
                     question.setQuestionContent(row.getCell(2).getStringCellValue().trim());
                     question.setExplanation(row.getCell(8).getStringCellValue().trim());
 
@@ -116,12 +147,29 @@ public class QuestionServiceImpl implements QuestionService  {
             XSSFSheet examSheet = workbook.getSheetAt(1);
             for (int i=1; i<examSheet.getPhysicalNumberOfRows(); i++){
                 XSSFRow row = examSheet.getRow(i);
-                XSSFCell idCell = row.getCell(0);
-                Question question;
 
-                if(idCell == null || idCell.getCellType() == CellType.BLANK){
-                    question = Question.builder()
-                            .type(row.getCell(1).getStringCellValue().trim().equals("Lý thuyết") ? 1 : 2)
+                // Xác định loại câu hỏi đã có hay chưa
+                String typeName = row.getCell(1).getStringCellValue().trim();
+                QuestionType type;
+                if(questionTypeRepository.existByTypeName(typeName)){
+                    type = questionTypeRepository.findByTypeName(typeName).get();
+                }
+                else {
+                    var newType = QuestionType.builder()
+                            .typeName(typeName)
+                            .build();
+                    type = questionTypeRepository.save(newType);
+                }
+
+                // Xác định câu hỏi đã tồn tại hay chưa, nếu rồi thì cập nhật, nếu chưa thì thêm mới
+                String questionCode = row.getCell(0).getStringCellValue().trim();
+                Optional<Question> questionOptional = questionRepository.findByQuestionCode(questionCode);
+
+                // Nếu là câu hỏi mới
+                if(questionOptional.isEmpty()){
+                    var question = Question.builder()
+                            .type(type)
+                            .questionCode(questionCode)
                             .questionContent(row.getCell(2).getStringCellValue().trim())
                             .questionBank(examQB)
                             .explanation(row.getCell(8) == null ? "" : row.getCell(8).getStringCellValue().trim())
@@ -137,9 +185,10 @@ public class QuestionServiceImpl implements QuestionService  {
                         answers.add(answer);
                     }
                 }
+                // Nếu câu hỏi đã tồn tại
                 else {
-                    question = questionRepository.findById(UUID.fromString(idCell.getStringCellValue().trim())).get();
-                    question.setType(row.getCell(1).getStringCellValue().trim().equals("Lý thuyết") ? 1 : 2);
+                    Question question = questionOptional.get();
+                    question.setType(type);
                     question.setQuestionContent(row.getCell(2).getStringCellValue().trim());
                     question.setExplanation(row.getCell(8).getStringCellValue().trim());
 
@@ -166,7 +215,7 @@ public class QuestionServiceImpl implements QuestionService  {
     public ResponseEntity<MessageResponse> modifyQuestion(String id, Question question) {
         try {
             Question savedQuestion = questionRepository.findById(UUID.fromString(id)).get();
-            savedQuestion.setType(question.getType());
+            savedQuestion.setType(questionTypeRepository.findByTypeName(question.getType().getTypeName()).get());
             savedQuestion.setQuestionContent(question.getQuestionContent());
             savedQuestion.setExplanation(question.getExplanation());
 
@@ -210,13 +259,13 @@ public class QuestionServiceImpl implements QuestionService  {
 
     @Override
     public boolean checkAnswer(String questionId, String selectedAnswer) {
-        Question question = questionRepository.findById(UUID.fromString(questionId)).orElseThrow();
-        return question.getAnswers().equals(selectedAnswer);
+//        Question question = questionRepository.findById(UUID.fromString(questionId)).orElseThrow();
+        return false;
     }
 
     @Override
     public String getExplanation(String questionId) {
-        Question question = questionRepository.findById(UUID.fromString(questionId)).orElseThrow();
-        return question.getExplanation();
+//        Question question = questionRepository.findById(UUID.fromString(questionId)).orElseThrow();
+        return null;
     }
 }

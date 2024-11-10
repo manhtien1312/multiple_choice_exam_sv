@@ -24,6 +24,11 @@ public class ClassController {
         return classService.getAllClassByTeacher();
     }
 
+    @GetMapping("/subject-class")
+    public ResponseEntity<?> getAllClassBySubject(@RequestParam String subjectId){
+        return classService.getAllClassBySubject(subjectId);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<Class> getClassById(@PathVariable String id){
         return classService.getClassById(id);

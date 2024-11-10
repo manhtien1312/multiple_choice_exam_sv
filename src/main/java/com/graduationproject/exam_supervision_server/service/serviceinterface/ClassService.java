@@ -11,6 +11,7 @@ import java.util.List;
 public interface ClassService {
 
     ResponseEntity<List<ClassDto>> getAllClassByTeacher();
+    ResponseEntity<?> getAllClassBySubject(String subjectId);
     ResponseEntity<Class> getClassById(String classId);
     ResponseEntity<List<ClassDto>> searchClass(ClassQueryParam queryParam);
     ResponseEntity<MessageResponse> createClass(ClassDto classDto);

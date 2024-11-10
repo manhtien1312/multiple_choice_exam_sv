@@ -15,34 +15,20 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "question")
-public class Question {
+@Table(name = "question_type")
+public class QuestionType {
 
     @Id
     @GeneratedValue
     private UUID id;
 
-    @ManyToOne
-    @JoinColumn(name = "question_type_id")
-    private QuestionType type;
-
-    private String questionCode;
-
-    @Column(columnDefinition = "TEXT")
-    private String questionContent;
+    private String typeName;
 
     @OneToMany(
-            mappedBy = "question",
+            mappedBy = "type",
             cascade = CascadeType.ALL
     )
-    private List<Answer> answers;
-
-    @Column(columnDefinition = "TEXT")
-    private String explanation;
-
-    @ManyToOne
-    @JoinColumn(name = "question_bank_id")
     @JsonIgnore
-    private QuestionBank questionBank;
+    private List<Question> questions;
 
 }

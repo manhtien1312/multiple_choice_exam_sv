@@ -21,9 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class QuestionBankServiceImpl implements QuestionBankService {
@@ -40,7 +38,8 @@ public class QuestionBankServiceImpl implements QuestionBankService {
             throw new RuntimeException("Ngân hàng không tồn tại, kiểm tra lại ID của môn học");
         }
         else {
-           return ResponseEntity.status(HttpStatus.OK).body(qb.map(questionBankMapper).get());
+            qb.get().getQuestions().sort(Comparator.comparing(Question::getQuestionCode));
+            return ResponseEntity.status(HttpStatus.OK).body(qb.map(questionBankMapper).get());
         }
     }
 
@@ -74,7 +73,7 @@ public class QuestionBankServiceImpl implements QuestionBankService {
 
         // Độ rộng và tiêu đề từng cột
         int[] columnWidthArr = {3000, 3000, 15000, 10000, 10000, 10000, 10000, 3000, 10000};
-        String[] headerArr = {"ID", "Loại câu hỏi", "Nội dung", "Đáp án 1", "Đáp án 2", "Đáp án 3", "Đáp án 4", "Đáp án đúng", "Giải thích"};
+        String[] headerArr = {"Mã câu hỏi", "Loại câu hỏi", "Nội dung", "Đáp án 1", "Đáp án 2", "Đáp án 3", "Đáp án 4", "Đáp án đúng", "Giải thích"};
 
         for (int i=0; i<=8; i++){
             reviewSheet.setColumnWidth(i, columnWidthArr[i]);
@@ -91,12 +90,16 @@ public class QuestionBankServiceImpl implements QuestionBankService {
 
         // Nội dung 2 ngân hàng câu hỏi
         int reviewRowIndex = 1;
-        for(Question question : reviewQB.getQuestions()){
+        List<Question> sortedQuestions = reviewQB.getQuestions();
+        sortedQuestions.sort(Comparator.comparing(Question::getQuestionCode));
+        for(Question question : sortedQuestions){
             displayQuestionInExcel(reviewSheet, reviewRowIndex, wrapTextStyle, question);
             reviewRowIndex++;
         }
 
         int examRowIndex = 1;
+        sortedQuestions = examQB.getQuestions();
+        sortedQuestions.sort(Comparator.comparing(Question::getQuestionCode));
         for(Question question : examQB.getQuestions()){
             displayQuestionInExcel(examSheet, examRowIndex, wrapTextStyle, question);
             examRowIndex++;
@@ -112,10 +115,10 @@ public class QuestionBankServiceImpl implements QuestionBankService {
     // Đổ nội dung câu hỏi lên 1 dòng excel
     private void displayQuestionInExcel(XSSFSheet sheet, int rowIndex, CellStyle style, Question question){
         XSSFRow dataRow = sheet.createRow(rowIndex);
-        dataRow.createCell(0).setCellValue(question.getId().toString());
+        dataRow.createCell(0).setCellValue(question.getQuestionCode());
 
         XSSFCell typeCell = dataRow.createCell(1);
-        typeCell.setCellValue(question.getType() == 1 ? "Lý thuyết" : "Vận dụng");
+        typeCell.setCellValue(question.getType().getTypeName());
         typeCell.setCellStyle(style);
 
         XSSFCell contentCell = dataRow.createCell(2);

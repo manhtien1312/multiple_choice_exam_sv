@@ -44,6 +44,20 @@ public class ClassServiceImpl implements ClassService {
     }
 
     @Override
+    public ResponseEntity<?> getAllClassBySubject(String subjectId) {
+        try {
+            List<Class> classes = classRepository.findClassBySubject(UUID.fromString(subjectId));
+            List<ClassDto> res = classes.stream()
+                    .map(classMapper)
+                    .toList();
+            return ResponseEntity.status(HttpStatus.OK).body(res);
+        } catch (Exception e){
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new MessageResponse("Lỗi Server. Thử lại sau!"));
+        }
+    }
+
+    @Override
     public ResponseEntity<Class> getClassById(String classId) {
         Class res = classRepository.findById(UUID.fromString(classId)).get();
         return ResponseEntity.status(HttpStatus.OK).body(res);
