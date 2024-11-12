@@ -32,6 +32,8 @@ public class Question {
             cascade = CascadeType.ALL
     )
     private List<Answer> answers;
+    
+    private int level;
 
     @Column(columnDefinition = "TEXT")
     private String explanation;
