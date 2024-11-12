@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.UUID;
+
 @RestController
 @CrossOrigin(origins = "*")
 @RequestMapping("/api/v1/question")
@@ -17,28 +19,27 @@ public class QuestionController {
     private QuestionService questionService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getQuestionById(@PathVariable String id){
+    public ResponseEntity<?> getQuestionById(@PathVariable UUID id) {
         return questionService.getQuestionById(id);
     }
 
     @PostMapping
-    public ResponseEntity<MessageResponse> addQuestion(@RequestParam String questionBankId, @RequestBody Question question){
+    public ResponseEntity<MessageResponse> addQuestion(@RequestParam String questionBankId, @RequestBody Question question) {
         return questionService.addQuestion(questionBankId, question);
     }
 
     @PostMapping("/add-file")
-    public ResponseEntity<MessageResponse> addThroughFile(@RequestParam String questionBankId, @RequestParam MultipartFile questionFile){
+    public ResponseEntity<MessageResponse> addThroughFile(@RequestParam String questionBankId, @RequestParam MultipartFile questionFile) {
         return questionService.addThroughFile(questionBankId, questionFile);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<MessageResponse> modifyQuestion(@PathVariable String id, @RequestBody Question question){
+    public ResponseEntity<MessageResponse> modifyQuestion(@PathVariable UUID id, @RequestBody Question question) {
         return questionService.modifyQuestion(id, question);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<MessageResponse> deleteQuestion(@PathVariable String id){
+    public ResponseEntity<MessageResponse> deleteQuestion(@PathVariable UUID id) {
         return questionService.deleteQuestion(id);
     }
-
 }

@@ -1,41 +1,39 @@
-package com.graduationproject.exam_supervision_server.model;
+    package com.graduationproject.exam_supervision_server.model;
 
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.springframework.context.annotation.EnableMBeanExport;
+    import jakarta.persistence.*;
+    import lombok.AllArgsConstructor;
+    import lombok.Builder;
+    import lombok.Data;
+    import lombok.NoArgsConstructor;
 
-import java.util.List;
-import java.util.UUID;
+    import java.util.List;
+    import java.util.UUID;
 
-@Entity
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-@Table(name = "exam_result")
-public class ExamResult {
+    @Entity
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    @Table(name = "exam_result")
+    public class ExamResult {
 
-    @Id
-    @GeneratedValue
-    private UUID id;
+        @Id
+        @GeneratedValue
+        private UUID id;
 
-    @ManyToOne
-    @JoinColumn(name = "exam_id")
-    private Exam exam;
+        @ManyToOne
+        @JoinColumn(name = "exam_id")
+        private Exam exam;
 
-    @ManyToOne
-    @JoinColumn(name = "student_id")
-    private Student student;
+        @ManyToOne
+        @JoinColumn(name = "student_id")
+        private Student student;
 
-    private Integer correctQuestions;
-    private Integer wrongQuestions;
-    private Integer blankQuestions;
-    private Double score;
+        private Integer correctQuestions;
+        private Integer wrongQuestions;
+        private Integer blankQuestions;
+        private Double score;
 
-    @ManyToMany(mappedBy = "examResults")
-    private List<Report> reports;
-
-}
+        @ManyToMany(mappedBy = "examResults")
+        private List<Report> reports;
+    }

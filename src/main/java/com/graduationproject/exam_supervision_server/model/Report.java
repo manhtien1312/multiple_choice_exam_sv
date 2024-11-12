@@ -21,14 +21,18 @@ public class Report {
     @GeneratedValue
     private UUID id;
 
-    private String reportName;
+    @ManyToOne
+    @JoinColumn(name = "exam_id")
+    private Exam exam;
 
     @ManyToMany
     @JoinTable(
-            name = "report_exam-result",
+            name = "report_exam_result",
             joinColumns = @JoinColumn(name = "report_id"),
             inverseJoinColumns = @JoinColumn(name = "exam_result_id")
     )
     private List<ExamResult> examResults;
+
+
 
 }
