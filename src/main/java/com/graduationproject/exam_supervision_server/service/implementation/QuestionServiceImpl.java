@@ -54,11 +54,13 @@ public class QuestionServiceImpl implements QuestionService  {
             Optional<QuestionBank> qb = questionBankRepository.findById(UUID.fromString(questionBankId));
             question.setQuestionBank(qb.get());
             String questionType = question.getType().getTypeName();
-            if(questionTypeRepository.existByTypeName(questionType)){
-                question.setType(questionTypeRepository.findByTypeName(questionType).get());
+            if(questionTypeRepository.existByTypeNameAndSubject(questionType, qb.get().getSubject().getId())){
+                question.setType(questionTypeRepository.findByTypeName(questionType, qb.get().getSubject().getId()).get());
             }
             else {
-                QuestionType savedType = questionTypeRepository.save(question.getType());
+                QuestionType type = question.getType();
+                type.setSubject(qb.get().getSubject());
+                QuestionType savedType = questionTypeRepository.save(type);
                 question.setType(savedType);
             }
             Question savedQuestion = questionRepository.save(question);
@@ -92,19 +94,20 @@ public class QuestionServiceImpl implements QuestionService  {
                 // Xác định loại câu hỏi đã có hay chưa
                 String typeName = row.getCell(1).getStringCellValue().trim();
                 QuestionType type;
-                if(questionTypeRepository.existByTypeName(typeName)){
-                    type = questionTypeRepository.findByTypeName(typeName).get();
+                if(questionTypeRepository.existByTypeNameAndSubject(typeName, reviewQB.getSubject().getId())){
+                    type = questionTypeRepository.findByTypeName(typeName, reviewQB.getSubject().getId()).get();
                 }
                 else {
                     var newType = QuestionType.builder()
                             .typeName(typeName)
+                            .subject(reviewQB.getSubject())
                             .build();
                     type = questionTypeRepository.save(newType);
                 }
 
                 // Xác định câu hỏi đã tồn tại hay chưa, nếu rồi thì cập nhật, nếu chưa thì thêm mới
                 String questionCode = row.getCell(0).getStringCellValue().trim();
-                Optional<Question> questionOptional = questionRepository.findByQuestionCode(questionCode);
+                Optional<Question> questionOptional = questionRepository.findByQuestionCode(questionCode, reviewQB.getId());
 
                 // Nếu là câu hỏi mới
                 if(questionOptional.isEmpty()){
@@ -151,19 +154,20 @@ public class QuestionServiceImpl implements QuestionService  {
                 // Xác định loại câu hỏi đã có hay chưa
                 String typeName = row.getCell(1).getStringCellValue().trim();
                 QuestionType type;
-                if(questionTypeRepository.existByTypeName(typeName)){
-                    type = questionTypeRepository.findByTypeName(typeName).get();
+                if(questionTypeRepository.existByTypeNameAndSubject(typeName, examQB.getSubject().getId())){
+                    type = questionTypeRepository.findByTypeName(typeName, examQB.getSubject().getId()).get();
                 }
                 else {
                     var newType = QuestionType.builder()
                             .typeName(typeName)
+                            .subject(examQB.getSubject())
                             .build();
                     type = questionTypeRepository.save(newType);
                 }
 
                 // Xác định câu hỏi đã tồn tại hay chưa, nếu rồi thì cập nhật, nếu chưa thì thêm mới
                 String questionCode = row.getCell(0).getStringCellValue().trim();
-                Optional<Question> questionOptional = questionRepository.findByQuestionCode(questionCode);
+                Optional<Question> questionOptional = questionRepository.findByQuestionCode(questionCode, examQB.getId());
 
                 // Nếu là câu hỏi mới
                 if(questionOptional.isEmpty()){
@@ -215,7 +219,7 @@ public class QuestionServiceImpl implements QuestionService  {
     public ResponseEntity<MessageResponse> modifyQuestion(String id, Question question) {
         try {
             Question savedQuestion = questionRepository.findById(UUID.fromString(id)).get();
-            savedQuestion.setType(questionTypeRepository.findByTypeName(question.getType().getTypeName()).get());
+//            savedQuestion.setType(questionTypeRepository.findByTypeName(question.getType().getTypeName(), ).get());
             savedQuestion.setQuestionContent(question.getQuestionContent());
             savedQuestion.setExplanation(question.getExplanation());
 

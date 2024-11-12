@@ -1,5 +1,6 @@
 package com.graduationproject.exam_supervision_server.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,12 +24,15 @@ public class ExamQuestion {
 
     private String examQuestionCode;
     private Integer totalQuestions;
-    private Integer theoryQuestions;
-    private Integer practicalQuestions;
 
     @ManyToOne
-    @JoinColumn(name = "class_id")
-    private Class classBelonged;
+    @JoinColumn(name = "teacher_id")
+    @JsonIgnore
+    private Teacher createdBy;
+
+    @ManyToOne
+    @JoinColumn(name = "subject_id")
+    private Subject subject;
 
     @ManyToMany
     @JoinTable(
@@ -37,7 +41,5 @@ public class ExamQuestion {
             inverseJoinColumns = @JoinColumn(name = "question_id")
     )
     private List<Question> questions;
-
-    private boolean isUsed;
 
 }

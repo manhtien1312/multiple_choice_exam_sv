@@ -38,6 +38,13 @@ public class Subject {
             cascade = CascadeType.ALL
     )
     @JsonIgnore
+    private List<QuestionType> types;
+
+    @OneToMany(
+            mappedBy = "subject",
+            cascade = CascadeType.ALL
+    )
+    @JsonIgnore
     private List<Class> classes;
 
     @OneToMany(
@@ -46,5 +53,13 @@ public class Subject {
     )
     @JsonIgnore
     private List<Exam> exams;
+
+    @OneToMany(
+            mappedBy = "subject",
+            cascade = CascadeType.ALL
+    )
+    @JsonIgnore
+    private List<ExamQuestion> examQuestions;
+
 
 }

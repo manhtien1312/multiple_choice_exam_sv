@@ -39,4 +39,11 @@ public class Teacher {
     @JsonIgnore
     private List<Class> classes;
 
+    @OneToMany(
+            mappedBy = "createdBy",
+            cascade = CascadeType.ALL
+    )
+    @JsonIgnore
+    private List<ExamQuestion> examQuestions;
+
 }

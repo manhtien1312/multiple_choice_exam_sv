@@ -24,6 +24,11 @@ public class QuestionType {
 
     private String typeName;
 
+    @ManyToOne
+    @JoinColumn(name = "subject_id")
+    @JsonIgnore
+    private Subject subject;
+
     @OneToMany(
             mappedBy = "type",
             cascade = CascadeType.ALL
