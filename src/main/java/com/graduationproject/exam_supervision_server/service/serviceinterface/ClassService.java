@@ -10,7 +10,9 @@ import java.util.List;
 
 public interface ClassService {
 
+    ResponseEntity<List<ClassDto>> getAllClasses();
     ResponseEntity<List<ClassDto>> getAllClassByTeacher();
+    ResponseEntity<List<ClassDto>> getAllClassByStudent();
     ResponseEntity<?> getAllClassBySubject(String subjectId);
     ResponseEntity<Class> getClassById(String classId);
     ResponseEntity<List<ClassDto>> searchClass(ClassQueryParam queryParam);

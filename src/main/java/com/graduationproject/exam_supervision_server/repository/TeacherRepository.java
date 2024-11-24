@@ -14,4 +14,7 @@ public interface TeacherRepository extends JpaRepository<Teacher, UUID> {
     @Query(value = "SELECT t FROM Teacher t WHERE t.account.username=:username")
     Optional<Teacher> findByAccountUsername(String username);
 
+    @Query(value = "SELECT t FROM Teacher t WHERE t.teacherName=:teacherName")
+    Optional<Teacher> findByTeacherName(String teacherName);
+
 }

@@ -22,8 +22,12 @@ public class QuestionController {
     }
 
     @PostMapping
-    public ResponseEntity<MessageResponse> addQuestion(@RequestParam String questionBankId, @RequestBody Question question){
-        return questionService.addQuestion(questionBankId, question);
+    public ResponseEntity<MessageResponse> addQuestion(
+            @RequestParam String questionBankId,
+            @RequestParam String questionStr,
+            @RequestParam(required = false) MultipartFile questionImage
+    ){
+        return questionService.addQuestion(questionBankId, questionStr, questionImage);
     }
 
     @PostMapping("/add-file")
@@ -32,8 +36,12 @@ public class QuestionController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<MessageResponse> modifyQuestion(@PathVariable String id, @RequestBody Question question){
-        return questionService.modifyQuestion(id, question);
+    public ResponseEntity<MessageResponse> modifyQuestion(
+            @PathVariable String id,
+            @RequestParam String questionStr,
+            @RequestParam(required = false) MultipartFile questionImage
+    ){
+        return questionService.modifyQuestion(id, questionStr, questionImage);
     }
 
     @DeleteMapping("/{id}")

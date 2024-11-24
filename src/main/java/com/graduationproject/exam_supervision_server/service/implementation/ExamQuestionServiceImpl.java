@@ -75,7 +75,7 @@ public class ExamQuestionServiceImpl implements ExamQuestionService {
     @Override
     public ResponseEntity<?> getAllExamQuestionBySubject(String subjectId) {
         try {
-            List<ExamQuestion> res = examQuestionRepository.findAllBySubjectId(UUID.fromString(subjectId), getTeacherFromRequest().getId());
+            List<ExamQuestion> res = examQuestionRepository.findAllBySubjectAndTeacher(UUID.fromString(subjectId), getTeacherFromRequest().getId());
             return ResponseEntity.status(HttpStatus.OK).body(res);
         }
         catch (Exception e){

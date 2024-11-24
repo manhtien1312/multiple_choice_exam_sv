@@ -4,8 +4,10 @@ import com.graduationproject.exam_supervision_server.dto.ClassDto;
 import com.graduationproject.exam_supervision_server.dto.request.ClassQueryParam;
 import com.graduationproject.exam_supervision_server.dto.response.MessageResponse;
 import com.graduationproject.exam_supervision_server.model.Class;
+import com.graduationproject.exam_supervision_server.model.Student;
 import com.graduationproject.exam_supervision_server.model.Teacher;
 import com.graduationproject.exam_supervision_server.repository.ClassRepository;
+import com.graduationproject.exam_supervision_server.repository.StudentRepository;
 import com.graduationproject.exam_supervision_server.repository.SubjectRepository;
 import com.graduationproject.exam_supervision_server.repository.TeacherRepository;
 import com.graduationproject.exam_supervision_server.service.serviceinterface.ClassService;
@@ -18,6 +20,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,12 +34,36 @@ public class ClassServiceImpl implements ClassService {
     @Autowired
     private TeacherRepository teacherRepository;
     @Autowired
+    private StudentRepository studentRepository;
+    @Autowired
     private ClassMapper classMapper;
+
+    @Override
+    public ResponseEntity<List<ClassDto>> getAllClasses() {
+        List<Class> classes = classRepository.findAll();
+        classes.sort(
+                Comparator.comparing((Class c) -> c.getSubject().getSubjectName(), String.CASE_INSENSITIVE_ORDER)
+                        .thenComparing(Class::getClassName, String.CASE_INSENSITIVE_ORDER)
+        );
+        List<ClassDto> res = classes.stream()
+                .map(classMapper)
+                .toList();
+        return ResponseEntity.status(HttpStatus.OK).body(res);
+    }
 
     @Override
     public ResponseEntity<List<ClassDto>> getAllClassByTeacher() {
         Teacher teacher = getTeacherFromRequest();
         List<Class> classes = classRepository.findClassByTeacherId(teacher.getId());
+        List<ClassDto> res = classes.stream()
+                .map(classMapper)
+                .toList();
+        return ResponseEntity.status(HttpStatus.OK).body(res);
+    }
+
+    @Override
+    public ResponseEntity<List<ClassDto>> getAllClassByStudent() {
+        List<Class> classes = getStudentFromRequest().getClasses();
         List<ClassDto> res = classes.stream()
                 .map(classMapper)
                 .toList();
@@ -96,7 +123,7 @@ public class ClassServiceImpl implements ClassService {
         var classObj = Class.builder()
                 .className(classDto.className())
                 .subject(subjectRepository.findBySubjectName(classDto.subject()).orElseThrow())
-                .teacher(getTeacherFromRequest())
+                .teacher(teacherRepository.findByTeacherName(classDto.teacherName()).get())
                 .build();
         classRepository.save(classObj);
         return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponse("Thêm lớp học thành công"));
@@ -112,5 +139,11 @@ public class ClassServiceImpl implements ClassService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         return teacherRepository.findByAccountUsername(userDetails.getUsername()).orElseThrow();
+    }
+
+    private Student getStudentFromRequest(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        return studentRepository.findByAccountUsername(userDetails.getUsername()).orElseThrow();
     }
 }

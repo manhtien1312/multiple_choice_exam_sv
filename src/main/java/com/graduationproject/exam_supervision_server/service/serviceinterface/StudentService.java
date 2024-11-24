@@ -10,8 +10,12 @@ import java.util.List;
 
 public interface StudentService {
 
+    ResponseEntity<List<Student>> getAllStudents();
     ResponseEntity<MessageResponse> addStudentToClass(String classId, Student student);
+    ResponseEntity<MessageResponse> addNewStudent(Student student);
+    ResponseEntity<MessageResponse> addStudentByFile(MultipartFile studentFile) throws IOException;
     ResponseEntity<MessageResponse> addStudentToClassByFile(String classId, MultipartFile studentFile) throws IOException;
     ResponseEntity<MessageResponse> removeStudentFromClass(String classId, List<String> selectedStudents);
+    ResponseEntity<MessageResponse> deleteStudent(List<String> selectedStudents);
 
 }

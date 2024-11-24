@@ -11,9 +11,9 @@ public interface QuestionService {
 
 
     ResponseEntity<?>getQuestionById(String id);
-    ResponseEntity<MessageResponse> addQuestion(String questionBankId, Question question);
+    ResponseEntity<MessageResponse> addQuestion(String questionBankId, String questionStr, MultipartFile questionImage);
     ResponseEntity<MessageResponse> addThroughFile(String subjectId, MultipartFile questionFile);
-    ResponseEntity<MessageResponse> modifyQuestion(String id, Question question);
+    ResponseEntity<MessageResponse> modifyQuestion(String id, String questionStr, MultipartFile questionImage);
     ResponseEntity<MessageResponse> deleteQuestion(String id);
 
 

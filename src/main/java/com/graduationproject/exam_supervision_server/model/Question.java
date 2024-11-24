@@ -27,9 +27,12 @@ public class Question {
     private QuestionType type;
 
     private String questionCode;
+    private Integer level;
 
     @Column(columnDefinition = "TEXT")
     private String questionContent;
+
+    private String imageUrl;
 
     @OneToMany(
             mappedBy = "question",

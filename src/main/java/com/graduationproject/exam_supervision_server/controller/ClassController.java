@@ -19,9 +19,19 @@ public class ClassController {
     @Autowired
     private ClassService classService;
 
+    @GetMapping
+    public ResponseEntity<List<ClassDto>> getAllClasses(){
+        return classService.getAllClasses();
+    }
+
     @GetMapping("/teacher-class")
     public ResponseEntity<List<ClassDto>> getAllClassByTeacher(){
         return classService.getAllClassByTeacher();
+    }
+
+    @GetMapping("/student-class")
+    public ResponseEntity<List<ClassDto>> getAllClassByStudent(){
+        return classService.getAllClassByStudent();
     }
 
     @GetMapping("/subject-class")

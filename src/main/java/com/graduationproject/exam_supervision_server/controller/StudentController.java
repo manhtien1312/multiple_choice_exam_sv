@@ -19,12 +19,27 @@ public class StudentController {
     @Autowired
     private StudentService studentService;
 
+    @GetMapping
+    public ResponseEntity<List<Student>> getAllStudents(){
+        return studentService.getAllStudents();
+    }
+
+    @PostMapping
+    public ResponseEntity<MessageResponse> addNewStudent(@RequestBody Student student){
+        return studentService.addNewStudent(student);
+    }
+
     @PostMapping("/add-to-class")
     public ResponseEntity<MessageResponse> addStudent(@RequestParam String classId, @RequestBody Student student){
         return studentService.addStudentToClass(classId, student);
     }
 
     @PostMapping("/add-student-file")
+    public ResponseEntity<MessageResponse> addStudentFile(@RequestParam MultipartFile studentFile) throws IOException {
+        return studentService.addStudentByFile(studentFile);
+    }
+
+    @PostMapping("/add-student-file-to-class")
     public ResponseEntity<MessageResponse> addStudentByFile(@RequestParam String classId, @RequestParam MultipartFile studentFile) throws IOException {
         return studentService.addStudentToClassByFile(classId, studentFile);
     }
@@ -34,4 +49,8 @@ public class StudentController {
         return studentService.removeStudentFromClass(classId, selectedStudents);
     }
 
+    @DeleteMapping("/delete-student")
+    public ResponseEntity<MessageResponse> deleteStudent(@RequestBody List<String> selectedStudents){
+        return studentService.deleteStudent(selectedStudents);
+    }
 }

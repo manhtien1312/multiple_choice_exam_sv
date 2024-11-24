@@ -16,6 +16,6 @@ public interface ExamQuestionRepository extends JpaRepository<ExamQuestion, UUID
     Optional<ExamQuestion> findByExamQuestionCode(String examQuestionCode);
 
     @Query(value = "SELECT eq FROM ExamQuestion eq WHERE eq.subject.id=:subjectId AND eq.createdBy.id=:teacherId ORDER BY eq.examQuestionCode")
-    List<ExamQuestion> findAllBySubjectId(UUID subjectId, UUID teacherId);
+    List<ExamQuestion> findAllBySubjectAndTeacher(UUID subjectId, UUID teacherId);
 
 }

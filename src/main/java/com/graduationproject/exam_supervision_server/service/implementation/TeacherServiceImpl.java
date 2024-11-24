@@ -17,10 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class TeacherServiceImpl implements TeacherService {
@@ -33,6 +30,7 @@ public class TeacherServiceImpl implements TeacherService {
     @Override
     public ResponseEntity<?> getAllTeacher() {
         List<Teacher> teachers = teacherRepository.findAll();
+        teachers.sort(Comparator.comparing(Teacher::getTeacherCode));
         return ResponseEntity.status(HttpStatus.OK).body(teachers);
     }
 
