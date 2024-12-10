@@ -46,6 +46,4 @@ public class Student {
     @JsonIgnore
     private List<ExamResult> examResults;
 
-    public String getName() {
-        return studentName;}
 }

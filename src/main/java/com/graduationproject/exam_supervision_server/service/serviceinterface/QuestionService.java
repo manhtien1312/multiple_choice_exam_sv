@@ -5,17 +5,23 @@ import com.graduationproject.exam_supervision_server.model.Question;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.UUID;
+import java.util.List;
 
 public interface QuestionService {
 
-    ResponseEntity<?> getQuestionById(UUID id);
 
-    ResponseEntity<MessageResponse> addQuestion(String questionBankId, Question question);
+    ResponseEntity<?>getQuestionById(String id);
+    ResponseEntity<MessageResponse> addQuestion(String questionBankId, String questionStr, MultipartFile questionImage);
+    ResponseEntity<MessageResponse> addThroughFile(String subjectId, MultipartFile questionFile);
+    ResponseEntity<MessageResponse> modifyQuestion(String id, String questionStr, MultipartFile questionImage);
+    ResponseEntity<MessageResponse> deleteQuestion(String id);
 
-    ResponseEntity<MessageResponse> addThroughFile(String questionBankId, MultipartFile questionFile);
 
-    ResponseEntity<MessageResponse> modifyQuestion(UUID id, Question question);
+    // NV Ngọc
+    List<Question> getPracticeQuestionsBySubject(String subjectId);
 
-    ResponseEntity<MessageResponse> deleteQuestion(UUID id);
+    boolean checkAnswer(String questionId, String selectedAnswer);
+
+    String getExplanation(String questionId);
+
 }

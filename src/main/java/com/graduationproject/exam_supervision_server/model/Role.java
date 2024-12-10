@@ -11,8 +11,8 @@ import java.util.UUID;
 public class Role {
 
     @Id
-    @GeneratedValue
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
 
     @Enumerated(EnumType.STRING)
     private ERole roleName;

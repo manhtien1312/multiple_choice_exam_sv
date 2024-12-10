@@ -1,35 +1,35 @@
 package com.graduationproject.exam_supervision_server.controller;
 
-import com.graduationproject.exam_supervision_server.dto.response.MessageResponse;
-import com.graduationproject.exam_supervision_server.service.serviceinterface.PracticeService;
 import com.graduationproject.exam_supervision_server.model.Question;
+import com.graduationproject.exam_supervision_server.service.serviceinterface.QuestionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
-@CrossOrigin(origins = "*")
-@RequestMapping("/api/v1/practice")
+@RequestMapping("/api/practice")
 public class PracticeController {
 
     @Autowired
-    private PracticeService practiceService;
+    private QuestionService questionService;
 
-    // Lấy câu hỏi luyện tập từ ngân hàng câu hỏi
-    @GetMapping("/questions/{questionBankId}")
-    public ResponseEntity<List<Question>> getPracticeQuestions(@PathVariable UUID questionBankId) {
-        List<Question> questions = practiceService.getPracticeQuestions(questionBankId);
+    @GetMapping("/subject/{subjectId}")
+    public ResponseEntity<List<Question>> getPracticeQuestions(@PathVariable String subjectId) {
+        List<Question> questions = questionService.getPracticeQuestionsBySubject(subjectId);
         return ResponseEntity.ok(questions);
     }
 
-    // Kiểm tra câu trả lời của người dùng
-    @PostMapping("/check-answer/{questionId}")
-    public ResponseEntity<MessageResponse> checkAnswer(@PathVariable UUID questionId, @RequestParam String answer) {
-        boolean isCorrect = practiceService.checkAnswer(questionId, answer);
-        String message = isCorrect ? "Answer is correct" : "Answer is incorrect";
-        return ResponseEntity.ok(new MessageResponse(message));
+    @PostMapping("/question/{questionId}/check")
+    public ResponseEntity<Boolean> checkAnswer(@PathVariable String questionId, @RequestBody String selectedAnswer) {
+        boolean isCorrect = questionService.checkAnswer(questionId, selectedAnswer);
+        return ResponseEntity.ok(isCorrect);
+    }
+
+    @GetMapping("/question/{questionId}/explanation")
+    public ResponseEntity<String> getExplanation(@PathVariable String questionId) {
+        String explanation = questionService.getExplanation(questionId);
+        return ResponseEntity.ok(explanation);
     }
 }

@@ -1,15 +1,14 @@
 package com.graduationproject.exam_supervision_server.service.serviceinterface;
 
-import com.graduationproject.exam_supervision_server.dto.ExamResultDTO;
+
+import com.graduationproject.exam_supervision_server.model.ExamResult;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
 public interface ExamResultServiceInterface {
+    List<ExamResult> getResultsByExam(String examId);
 
-    List<ExamResultDTO> getResultsByExam(UUID examId);
-
-    // Thêm khai báo ngoại lệ IOException trong interface
-    void exportResultsToExcel(UUID examId) throws IOException;
+    void exportResultsToExcel(String examId) throws IOException;
 }

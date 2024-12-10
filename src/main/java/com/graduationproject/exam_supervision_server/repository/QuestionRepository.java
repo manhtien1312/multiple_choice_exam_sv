@@ -1,16 +1,34 @@
 package com.graduationproject.exam_supervision_server.repository;
 
 import com.graduationproject.exam_supervision_server.model.Question;
+import com.graduationproject.exam_supervision_server.model.QuestionType;
+import com.graduationproject.exam_supervision_server.model.Student;
+import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
+@Repository
 public interface QuestionRepository extends JpaRepository<Question, UUID> {
 
-    // Lấy câu hỏi theo QuestionBankId
-    List<Question> findByQuestionBankId(UUID questionBankId);
+    @Query(value = "SELECT q FROM Question q WHERE q.questionCode=:questionCode AND q.questionBank.id=:questionBankId")
+    Optional<Question> findByQuestionCode(String questionCode, UUID questionBankId);
 
-    // Lấy câu hỏi theo subjectId và type của QuestionBank
-    List<Question> findByQuestionBank_SubjectIdAndQuestionBank_Type(String subjectId, String type);
+    @Query(value = "SELECT q FROM Question q WHERE q.questionBank.id=:questionBankId AND q.type.typeName=:typeName ORDER BY FUNCTION('RAND')")
+    List<Question> findRandomQuestionsByType(String typeName, UUID questionBankId, Pageable pageable);
+
+
+    /* NV Ngọc sửa
+     NM Tiến: Question không có trường subject nên hàm này không chạy được.
+     Nếu muốn lấy tất cả câu hỏi ôn tập của 1 subject thì chỉ cần lấy QuestionBank bằng questionBankId
+     hoặc lấy QuestionBank bằng subjectId và type
+     Vì mỗi Subject chỉ có 2 QuestionBank (không có hơn)
+     */
+//    List<Question> findBySubjectId(UUID subjectId);
 }

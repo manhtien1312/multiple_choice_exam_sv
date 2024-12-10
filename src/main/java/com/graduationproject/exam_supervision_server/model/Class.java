@@ -44,8 +44,4 @@ public class Class {
     @JsonIgnore
     private List<Exam> exams;
 
-    @OneToMany(mappedBy = "classBelonged")
-    @JsonIgnore
-    private List<ExamQuestion> examQuestions;
-
 }
