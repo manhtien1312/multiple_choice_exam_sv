@@ -18,6 +18,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -111,5 +112,42 @@ public class AccountServiceImpl implements AccountService {
         } catch (Exception e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponse("Thông tin đăng nhập không chính xác!"));
         }
+    }
+
+    @Override
+    public ResponseEntity<MessageResponse> changePassword(String oldPassword, String newPassword, String role) {
+        switch (role){
+            case "ROLE_TEACHER":
+                Teacher teacher = getTeacherFromRequest();
+                Account teacherAccount = teacher.getAccount();
+                if(!passwordEncoder.matches(oldPassword, teacherAccount.getPassword())){
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponse("Mật khẩu cũ không chính xác!"));
+                }
+                teacherAccount.setPassword(passwordEncoder.encode(newPassword));
+                accountRepository.save(teacherAccount);
+                break;
+            case "ROLE_STUDENT":
+                Student student = getStudentFromRequest();
+                Account studentAccount = student.getAccount();
+                if(!passwordEncoder.matches(oldPassword, studentAccount.getPassword())){
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponse("Mật khẩu cũ không chính xác!"));
+                }
+                studentAccount.setPassword(passwordEncoder.encode(newPassword));
+                accountRepository.save(studentAccount);
+                break;
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(new MessageResponse("Thay đổi mật khẩu thành công!"));
+    }
+
+    private Teacher getTeacherFromRequest(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        return teacherRepository.findByAccountUsername(userDetails.getUsername()).orElseThrow();
+    }
+
+    private Student getStudentFromRequest(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        return studentRepository.findByAccountUsername(userDetails.getUsername()).orElseThrow();
     }
 }

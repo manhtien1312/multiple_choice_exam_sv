@@ -11,5 +11,6 @@ public interface AccountService {
     ResponseEntity<MessageResponse> registerAdmin(SignUpRequest request);
     Account register(SignUpRequest request);
     ResponseEntity<?> login(LoginRequest request);
+    ResponseEntity<MessageResponse> changePassword(String oldPassword, String newPassword, String role);
 
 }
