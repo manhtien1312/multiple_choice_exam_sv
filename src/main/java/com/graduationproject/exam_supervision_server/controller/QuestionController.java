@@ -21,6 +21,16 @@ public class QuestionController {
         return questionService.getQuestionById(id);
     }
 
+    @GetMapping("/filter")
+    public ResponseEntity<?> filterQuestion(
+            @RequestParam String questionBankId,
+            @RequestParam(required = false) String typeName,
+            @RequestParam(required = false) Integer level,
+            @RequestParam(required = false) String searchText
+    ){
+        return questionService.filterQuestion(questionBankId, typeName, level, searchText);
+    }
+
     @PostMapping
     public ResponseEntity<MessageResponse> addQuestion(
             @RequestParam String questionBankId,

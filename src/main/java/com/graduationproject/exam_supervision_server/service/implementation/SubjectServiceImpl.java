@@ -51,6 +51,22 @@ public class SubjectServiceImpl implements SubjectService {
     }
 
     @Override
+    public ResponseEntity<?> searchSubject(String searchText) {
+        try {
+            List<Subject> subjects = subjectRepository.findAll();
+            subjects.sort(Comparator.comparing(Subject::getSubjectCode));
+            List<Subject> res = subjects.stream()
+                    .filter(subject -> subject.getSubjectCode().toLowerCase().contains(searchText.toLowerCase()) ||
+                            subject.getSubjectName().toLowerCase().contains(searchText.toLowerCase()))
+                    .toList();
+            return ResponseEntity.status(HttpStatus.OK).body(res);
+        } catch (Exception e){
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new MessageResponse("Lỗi Server. Thử Lại Sau!"));
+        }
+    }
+
+    @Override
     public ResponseEntity<MessageResponse> addSubject(SubjectDto subjectDto) {
         try {
             if(subjectRepository.existBySubjectCode(subjectDto.subjectCode())){

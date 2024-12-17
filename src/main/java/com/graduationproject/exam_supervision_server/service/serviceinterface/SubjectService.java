@@ -11,6 +11,7 @@ public interface SubjectService {
 
     ResponseEntity<?> getAllSubjects();
     ResponseEntity<?> getSubjectById(String id);
+    ResponseEntity<?> searchSubject(String searchText);
     ResponseEntity<MessageResponse> addSubject(SubjectDto subjectDto);
     ResponseEntity<MessageResponse> modifySubject(String id, SubjectDto subjectDto);
     ResponseEntity<MessageResponse> deleteSubject(String id);

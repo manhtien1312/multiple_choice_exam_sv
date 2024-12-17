@@ -20,8 +20,11 @@ public interface QuestionRepository extends JpaRepository<Question, UUID> {
     @Query(value = "SELECT q FROM Question q WHERE q.questionCode=:questionCode AND q.questionBank.id=:questionBankId")
     Optional<Question> findByQuestionCode(String questionCode, UUID questionBankId);
 
-    @Query(value = "SELECT q FROM Question q WHERE q.questionBank.id=:questionBankId AND q.type.typeName=:typeName ORDER BY FUNCTION('RAND')")
-    List<Question> findRandomQuestionsByType(String typeName, UUID questionBankId, Pageable pageable);
+    @Query(value = "SELECT q FROM Question q " +
+            "WHERE q.questionBank.id=:questionBankId " +
+            "AND q.type.typeName=:typeName AND q.level=:level " +
+            "ORDER BY FUNCTION('RAND')")
+    List<Question> findRandomQuestionsByType(String typeName, int level, UUID questionBankId, Pageable pageable);
 
 
     /* NV Ngọc sửa

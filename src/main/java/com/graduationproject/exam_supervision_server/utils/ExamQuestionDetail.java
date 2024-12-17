@@ -4,6 +4,8 @@ import com.graduationproject.exam_supervision_server.model.QuestionType;
 
 public record ExamQuestionDetail(
         String typeName,
-        Integer numberOfQuestions
+        Integer easy,
+        Integer medium,
+        Integer hard
 ) {
 }

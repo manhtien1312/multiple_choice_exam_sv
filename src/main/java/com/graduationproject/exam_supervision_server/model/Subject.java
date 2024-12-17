@@ -26,6 +26,10 @@ public class Subject {
     private String subjectCode;
     private String subjectName;
 
+    @ManyToOne
+    @JoinColumn(name = "major_id")
+    private Major major;
+
     @OneToMany(
             mappedBy = "subject",
             cascade = CascadeType.ALL

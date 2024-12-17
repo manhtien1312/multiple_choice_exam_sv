@@ -27,6 +27,11 @@ public class SubjectController {
         return subjectService.getSubjectById(id);
     }
 
+    @GetMapping("/filter")
+    public ResponseEntity<?> searchSubject(@RequestParam String searchText){
+        return subjectService.searchSubject(searchText);
+    }
+
     @PostMapping
     public ResponseEntity<MessageResponse> addSubject(@Valid @RequestBody SubjectDto subjectDto){
         return subjectService.addSubject(subjectDto);

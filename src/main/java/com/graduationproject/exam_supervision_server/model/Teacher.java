@@ -27,6 +27,10 @@ public class Teacher {
     private String phoneNumber;
     private String email;
 
+    @ManyToOne
+    @JoinColumn(name = "major_id")
+    private Major major;
+
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "account_id")
     @JsonIgnore

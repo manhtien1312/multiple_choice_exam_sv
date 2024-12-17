@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class QuestionServiceImpl implements QuestionService  {
@@ -48,6 +49,52 @@ public class QuestionServiceImpl implements QuestionService  {
         try {
             Question question = questionRepository.findById(UUID.fromString(id)).get();
             return ResponseEntity.status(HttpStatus.OK).body(question);
+        } catch (Exception e){
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new MessageResponse("Lỗi Server. Thử Lại Sau!"));
+        }
+    }
+
+    @Override
+    public ResponseEntity<?> filterQuestion(String questionBankId, String typeName, int level, String searchText) {
+        try {
+            List<Question> questions = questionBankRepository.findById(UUID.fromString(questionBankId)).get().getQuestions();
+            questions.sort(Comparator.comparing(Question::getQuestionCode));
+            List<Question> filteredTypeQuestions;
+            List<Question> filteredLevelQuestions;
+            List<Question> res;
+
+            // Lọc loại câu hỏi
+            if(!typeName.isBlank()){
+                filteredTypeQuestions = questions.stream()
+                        .filter(question -> question.getType().getTypeName().equals(typeName))
+                        .toList();
+            }
+            else {
+                filteredTypeQuestions = questions;
+            }
+
+            // Lọc độ khó
+            if(level != 0){
+                filteredLevelQuestions = filteredTypeQuestions.stream()
+                        .filter(question -> question.getLevel() == level)
+                        .toList();
+            }
+            else {
+                filteredLevelQuestions = filteredTypeQuestions;
+            }
+
+            // Tìm kiếm
+            if(!searchText.isBlank()){
+                res = questions.stream()
+                        .filter(question -> question.getQuestionContent().toLowerCase().contains(searchText.toLowerCase()))
+                        .toList();
+            } else {
+                res = filteredLevelQuestions;
+            }
+
+            return ResponseEntity.status(HttpStatus.OK).body(res);
+
         } catch (Exception e){
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new MessageResponse("Lỗi Server. Thử Lại Sau!"));

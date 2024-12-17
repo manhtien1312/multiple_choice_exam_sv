@@ -104,7 +104,7 @@ public class AccountServiceImpl implements AccountService {
                     break;
                 case ROLE_STUDENT:
                     Student student = studentRepository.findByAccountUsername(request.username()).get();
-                    userFullName = student.getStudentName();
+                    userFullName = student.getStudentFullName();
                     break;
             }
             return ResponseEntity.status(HttpStatus.OK).body(new JwtTokenResponse(token, account.getRole().getRoleName().name(), userFullName));

@@ -4,6 +4,7 @@ import com.graduationproject.exam_supervision_server.dto.response.MessageRespons
 import com.graduationproject.exam_supervision_server.model.Student;
 import com.graduationproject.exam_supervision_server.service.serviceinterface.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,8 +21,23 @@ public class StudentController {
     private StudentService studentService;
 
     @GetMapping
-    public ResponseEntity<List<Student>> getAllStudents(){
-        return studentService.getAllStudents();
+    public ResponseEntity<Page<Student>> getAllStudents(@RequestParam Integer pageNumber){
+        return studentService.getAllStudents(pageNumber);
+    }
+
+    @GetMapping("/filter")
+    public ResponseEntity<Page<Student>> filterStudent(
+            @RequestParam(required = false) String searchText,
+            @RequestParam(required = false) String majorName,
+            @RequestParam(required = false) String cohort,
+            @RequestParam Integer pageNumber
+    ){
+        return studentService.filterStudent(searchText, majorName, cohort, pageNumber);
+    }
+
+    @GetMapping("/cohort")
+    public ResponseEntity<List<String>> getAllCohort(){
+        return studentService.getAllCohort();
     }
 
     @PostMapping
@@ -42,6 +58,11 @@ public class StudentController {
     @PostMapping("/add-student-file-to-class")
     public ResponseEntity<MessageResponse> addStudentByFile(@RequestParam String classId, @RequestParam MultipartFile studentFile) throws IOException {
         return studentService.addStudentToClassByFile(classId, studentFile);
+    }
+
+    @PutMapping
+    public ResponseEntity<MessageResponse> updateStudent(@RequestBody Student student){
+        return studentService.updateStudent(student);
     }
 
     @DeleteMapping("/remove-from-class")

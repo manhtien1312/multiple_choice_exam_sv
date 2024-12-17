@@ -23,7 +23,14 @@ public class Student {
     private UUID id;
 
     private String studentCode;
-    private String studentName;
+    private String studentFullName;
+    private String studentFirstName;
+    private String email;
+    private String cohort;
+
+    @ManyToOne
+    @JoinColumn(name = "major_id")
+    private Major major;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "account_id")
@@ -34,9 +41,9 @@ public class Student {
     @JsonIgnore
     private List<Class> classes;
 
-    @ManyToMany(mappedBy = "allowedStudents")
+    @OneToMany(mappedBy = "student")
     @JsonIgnore
-    private List<Exam> exams;
+    private List<ExamStudent> examStudents;
 
     @OneToMany(mappedBy = "student")
     @JsonIgnore

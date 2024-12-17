@@ -47,12 +47,21 @@ public class ExamQuestionServiceImpl implements ExamQuestionService {
             QuestionBank qb = questionBankRepository.findBySubjectId(UUID.fromString(request.subjectId()), 1).get();
             List<Question> questions = new ArrayList<>();
             for (ExamQuestionDetail detail : request.details()){
-                if(detail.numberOfQuestions() == 0){
-                    continue;
+                if(detail.easy() != 0){
+                    Pageable limit = PageRequest.of(0, detail.easy());
+                    List<Question> randomQuestions = questionRepository.findRandomQuestionsByType(detail.typeName(), 1, qb.getId(), limit);
+                    questions.addAll(randomQuestions);
                 }
-                Pageable limit = PageRequest.of(0, detail.numberOfQuestions());
-                List<Question> randomQuestions = questionRepository.findRandomQuestionsByType(detail.typeName(), qb.getId(), limit);
-                questions.addAll(randomQuestions);
+                if(detail.medium() != 0){
+                    Pageable limit = PageRequest.of(0, detail.medium());
+                    List<Question> randomQuestions = questionRepository.findRandomQuestionsByType(detail.typeName(), 2, qb.getId(), limit);
+                    questions.addAll(randomQuestions);
+                }
+                if(detail.hard() != 0){
+                    Pageable limit = PageRequest.of(0, detail.hard());
+                    List<Question> randomQuestions = questionRepository.findRandomQuestionsByType(detail.typeName(), 3, qb.getId(), limit);
+                    questions.addAll(randomQuestions);
+                }
             }
 
             var examQuestion = ExamQuestion.builder()

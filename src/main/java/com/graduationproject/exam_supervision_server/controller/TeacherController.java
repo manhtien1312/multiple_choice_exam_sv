@@ -28,6 +28,16 @@ public class TeacherController {
         return teacherService.getTeacherById(id);
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<?> searchTeacher(@RequestParam String searchText){
+        return teacherService.searchTeacher(searchText);
+    }
+
+    @GetMapping("/filter")
+    public ResponseEntity<?> filterTeacher(@RequestParam String majorName){
+        return teacherService.filterTeacher(majorName);
+    }
+
     @PostMapping
     public ResponseEntity<MessageResponse> addTeacher(@RequestBody Teacher teacher){
         return teacherService.addTeacher(teacher);

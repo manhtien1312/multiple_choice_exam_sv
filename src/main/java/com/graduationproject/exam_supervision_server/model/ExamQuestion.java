@@ -42,4 +42,8 @@ public class ExamQuestion {
     )
     private List<Question> questions;
 
+    @OneToMany(mappedBy = "examQuestion")
+    @JsonIgnore
+    private List<ExamStudent> examStudents;
+
 }

@@ -1,10 +1,10 @@
 package com.graduationproject.exam_supervision_server.service.implementation;
 
 import com.graduationproject.exam_supervision_server.dto.ClassDto;
-import com.graduationproject.exam_supervision_server.dto.request.ClassQueryParam;
 import com.graduationproject.exam_supervision_server.dto.response.MessageResponse;
 import com.graduationproject.exam_supervision_server.model.Class;
 import com.graduationproject.exam_supervision_server.model.Student;
+import com.graduationproject.exam_supervision_server.model.Subject;
 import com.graduationproject.exam_supervision_server.model.Teacher;
 import com.graduationproject.exam_supervision_server.repository.ClassRepository;
 import com.graduationproject.exam_supervision_server.repository.StudentRepository;
@@ -12,6 +12,10 @@ import com.graduationproject.exam_supervision_server.repository.SubjectRepositor
 import com.graduationproject.exam_supervision_server.repository.TeacherRepository;
 import com.graduationproject.exam_supervision_server.service.serviceinterface.ClassService;
 import com.graduationproject.exam_supervision_server.utils.dtomapper.ClassMapper;
+import jakarta.transaction.Transactional;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,10 +23,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class ClassServiceImpl implements ClassService {
@@ -87,45 +95,72 @@ public class ClassServiceImpl implements ClassService {
     @Override
     public ResponseEntity<Class> getClassById(String classId) {
         Class res = classRepository.findById(UUID.fromString(classId)).get();
+        res.getStudents().sort(Comparator.comparing(Student::getStudentFirstName));
         return ResponseEntity.status(HttpStatus.OK).body(res);
     }
 
     @Override
-    public ResponseEntity<List<ClassDto>> searchClass(ClassQueryParam queryParam) {
+    public ResponseEntity<List<ClassDto>> searchClass(String searchText) {
         List<ClassDto> classes = classRepository.findAll().stream()
                 .map(classMapper)
                 .toList();
-        List<ClassDto> firstFilteredClasses;
-        List<ClassDto> res;
 
-        if (queryParam.subjectName() != null) {
-            firstFilteredClasses = classes.stream()
-                    .filter(classObj -> classObj.subject().equals(queryParam.subjectName()))
-                    .toList();
-        }
-        else {
-            firstFilteredClasses = classes;
-        }
-
-        if (queryParam.teacherName() != null){
-            res = firstFilteredClasses.stream()
-                    .filter(classObj -> classObj.teacherName().equals(queryParam.teacherName()))
-                    .toList();
-        }
-        else {
-            res = firstFilteredClasses;
-        }
+        String lowerSearchText = searchText.toLowerCase();
+        List<ClassDto> res = classes.stream()
+                .filter(classDto -> classDto.subject().toLowerCase().contains(lowerSearchText) ||
+                        classDto.teacherName().toLowerCase().contains(lowerSearchText) ||
+                        classDto.className().toLowerCase().contains(lowerSearchText))
+                .collect(Collectors.toList());
         return ResponseEntity.status(HttpStatus.OK).body(res);
     }
 
     @Override
-    public ResponseEntity<MessageResponse> createClass(ClassDto classDto) {
-        var classObj = Class.builder()
-                .className(classDto.className())
-                .subject(subjectRepository.findBySubjectName(classDto.subject()).orElseThrow())
-                .teacher(teacherRepository.findByTeacherName(classDto.teacherName()).get())
-                .build();
-        classRepository.save(classObj);
+    @Transactional
+    public ResponseEntity<MessageResponse> createClass(String subjectName, MultipartFile classFile) throws IOException {
+//        var classObj = Class.builder()
+//                .className(classDto.className())
+//                .subject(subjectRepository.findBySubjectName(classDto.subject()).orElseThrow())
+//                .teacher(teacherRepository.findByTeacherName(classDto.teacherName()).get())
+//                .build();
+//        classRepository.save(classObj);
+//        return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponse("Thêm lớp học thành công"));
+        Subject subject = subjectRepository.findBySubjectName(subjectName).orElseThrow();
+
+        XSSFWorkbook workbook = new XSSFWorkbook(classFile.getInputStream());
+        for(int i=0; i<workbook.getNumberOfSheets(); i++){
+            XSSFSheet sheet = workbook.getSheetAt(i);
+
+            String className = sheet.getSheetName();
+
+            String teacherCode = sheet.getRow(1).getCell(1).getStringCellValue().trim();
+            Teacher teacher = teacherRepository.findByTeacherCode(teacherCode).orElseThrow();
+
+            Class newClass = Class.builder()
+                            .className(className)
+                            .subject(subject)
+                            .teacher(teacher)
+                            .build();
+
+            Class savedClass = classRepository.save(newClass);
+
+            List<Student> students = new ArrayList<>();
+            for(int j=6; j<sheet.getPhysicalNumberOfRows(); j++){
+                XSSFRow row = sheet.getRow(j);
+
+                String studentCode = row.getCell(0).getStringCellValue().trim();
+                String studentName = row.getCell(1).getStringCellValue().trim();
+
+                if(!studentRepository.existByStudentCode(studentCode)){
+                    String message = "Sinh viên chưa có trong hệ thống: " + studentCode + " - " + studentName;
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponse(message));
+                } else {
+                    Student savedStudent = studentRepository.findByStudentCode(studentCode).get();
+                    students.add(savedStudent);
+                }
+            }
+            savedClass.setStudents(students);
+            classRepository.save(savedClass);
+        }
         return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponse("Thêm lớp học thành công"));
     }
 
