@@ -27,9 +27,14 @@ public class SubjectController {
         return subjectService.getSubjectById(id);
     }
 
-    @GetMapping("/filter")
+    @GetMapping("/search")
     public ResponseEntity<?> searchSubject(@RequestParam String searchText){
         return subjectService.searchSubject(searchText);
+    }
+
+    @GetMapping("/filter")
+    public ResponseEntity<?> filterSubject(@RequestParam String majorName){
+        return subjectService.filterSubject(majorName);
     }
 
     @PostMapping

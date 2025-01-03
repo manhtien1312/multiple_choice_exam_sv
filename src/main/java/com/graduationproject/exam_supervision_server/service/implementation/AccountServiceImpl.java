@@ -135,6 +135,14 @@ public class AccountServiceImpl implements AccountService {
                 studentAccount.setPassword(passwordEncoder.encode(newPassword));
                 accountRepository.save(studentAccount);
                 break;
+            case "ROLE_ADMIN":
+                Account adminAccount = accountRepository.findByUsername("admin").get();
+                if(!passwordEncoder.matches(oldPassword, adminAccount.getPassword())){
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponse("Mật khẩu cũ không chính xác!"));
+                }
+                adminAccount.setPassword(passwordEncoder.encode(newPassword));
+                accountRepository.save(adminAccount);
+                break;
         }
         return ResponseEntity.status(HttpStatus.OK).body(new MessageResponse("Thay đổi mật khẩu thành công!"));
     }

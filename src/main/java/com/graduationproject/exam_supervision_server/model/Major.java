@@ -24,7 +24,7 @@ public class Major {
 
     private String majorName;
 
-    @OneToMany(mappedBy = "major")
+    @ManyToMany(mappedBy = "majors")
     @JsonIgnore
     private List<Subject> subjects;
 

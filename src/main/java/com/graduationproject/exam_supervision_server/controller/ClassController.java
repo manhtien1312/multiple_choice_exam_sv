@@ -4,13 +4,16 @@ import com.graduationproject.exam_supervision_server.dto.ClassDto;
 import com.graduationproject.exam_supervision_server.dto.response.MessageResponse;
 import com.graduationproject.exam_supervision_server.model.Class;
 import com.graduationproject.exam_supervision_server.service.serviceinterface.ClassService;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.text.Normalizer;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -50,6 +53,18 @@ public class ClassController {
         return classService.searchClass(searchText);
     }
 
+    @GetMapping("/export-class-students")
+    public void exportClassStudents(@RequestParam String classId, HttpServletResponse response) throws Exception{
+        Class classDto = classService.getClassById(classId).getBody();
+        response.setContentType("application/octet-stream");
+
+        String headerKey = "Content-Disposition";
+        String headerValue = "attachment;filename=danh-sach-sinh-vien-" + normalizeString(classDto.getClassName() + " " + classDto.getSubject().getSubjectName()) + ".xlsx";
+        response.setHeader(headerKey, headerValue);
+
+        classService.generateListStudentExcel(classId, response);
+    }
+
     @PostMapping
     public ResponseEntity<MessageResponse> createClass(@RequestParam String subjectName, @RequestParam MultipartFile classFile) throws IOException {
         return classService.createClass(subjectName, classFile);
@@ -58,6 +73,22 @@ public class ClassController {
     @DeleteMapping("/{id}")
     public ResponseEntity<MessageResponse> deleteClass(@PathVariable String id){
         return classService.deleteClass(id);
+    }
+
+    // Hàm chuẩn hóa tên file, vd: Lập trình mạng -> lap-trinh-mang
+    private String normalizeString(String className){
+        // chuẩn hóa ký tự
+        String normalized = Normalizer.normalize(className, Normalizer.Form.NFD);
+
+        // loại bỏ ký tự dấu
+        String noAccentsStr = normalized.replaceAll("\\p{M}", "");
+
+        // thay thế khoảng trắng bằng gạch ngang
+        String result = noAccentsStr.replaceAll(" ", "-").toLowerCase();
+
+        // loại bỏ ký tự đặc biệt
+        result = result.replaceAll("[^a-zA-Z0-9-]", "");
+        return result;
     }
 
 }

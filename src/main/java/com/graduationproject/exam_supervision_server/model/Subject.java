@@ -26,9 +26,13 @@ public class Subject {
     private String subjectCode;
     private String subjectName;
 
-    @ManyToOne
-    @JoinColumn(name = "major_id")
-    private Major major;
+    @ManyToMany
+    @JoinTable(
+            name = "major_subject",
+            joinColumns = @JoinColumn(name = "subject_id"),
+            inverseJoinColumns = @JoinColumn(name = "major_id")
+    )
+    private List<Major> majors;
 
     @OneToMany(
             mappedBy = "subject",

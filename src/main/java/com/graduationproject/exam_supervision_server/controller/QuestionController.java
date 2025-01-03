@@ -31,6 +31,11 @@ public class QuestionController {
         return questionService.filterQuestion(questionBankId, typeName, level, searchText);
     }
 
+    @GetMapping("/newest-questionCode")
+    public ResponseEntity<String> getNewestQuestionCode(@RequestParam String typeName, @RequestParam String questionBankId){
+        return questionService.getNewestQuestionCode(typeName, questionBankId);
+    }
+
     @PostMapping
     public ResponseEntity<MessageResponse> addQuestion(
             @RequestParam String questionBankId,

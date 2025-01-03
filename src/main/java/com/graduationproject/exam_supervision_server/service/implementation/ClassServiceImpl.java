@@ -12,7 +12,14 @@ import com.graduationproject.exam_supervision_server.repository.SubjectRepositor
 import com.graduationproject.exam_supervision_server.repository.TeacherRepository;
 import com.graduationproject.exam_supervision_server.service.serviceinterface.ClassService;
 import com.graduationproject.exam_supervision_server.utils.dtomapper.ClassMapper;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
+import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -100,6 +107,56 @@ public class ClassServiceImpl implements ClassService {
     }
 
     @Override
+    public void generateListStudentExcel(String classId, HttpServletResponse response) throws IOException {
+        Class classDto = classRepository.findById(UUID.fromString(classId)).get();
+        List<Student> students = classDto.getStudents();
+
+        XSSFWorkbook workbook = new XSSFWorkbook();
+
+        // Font chữ in đậm và căn giữa ô
+        Font headerFont = workbook.createFont();
+        headerFont.setBold(true);
+        CellStyle headerStyle = workbook.createCellStyle();
+        headerStyle.setFont(headerFont);
+        headerStyle.setAlignment(HorizontalAlignment.CENTER);
+        headerStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+
+        // Wrap text
+        CellStyle wrapTextStyle = workbook.createCellStyle();
+        wrapTextStyle.setWrapText(true);
+        wrapTextStyle.setAlignment(HorizontalAlignment.CENTER);
+        wrapTextStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+
+        XSSFSheet sheet = workbook.createSheet("Danh sách sinh viên");
+        XSSFRow titleRow = sheet.createRow(0);
+
+        sheet.setColumnWidth(0, 5000);
+        sheet.setColumnWidth(1, 5000);
+
+        XSSFCell studentCodeCell = titleRow.createCell(0);
+        studentCodeCell.setCellValue("Mã sinh viên");
+        studentCodeCell.setCellStyle(headerStyle);
+
+        XSSFCell studentNameCell = titleRow.createCell(1);
+        studentNameCell.setCellValue("Họ và tên");
+        studentNameCell.setCellStyle(headerStyle);
+
+        students.sort(Comparator.comparing(Student::getStudentFirstName));
+        int rowIndex = 1;
+        for(Student student : students){
+            XSSFRow row = sheet.createRow(rowIndex);
+            row.createCell(0).setCellValue(student.getStudentCode());
+            row.createCell(1).setCellValue(student.getStudentFullName());
+            rowIndex++;
+        }
+
+        ServletOutputStream ops = response.getOutputStream();
+        workbook.write(ops);
+        workbook.close();
+        ops.close();
+    }
+
+    @Override
     public ResponseEntity<List<ClassDto>> searchClass(String searchText) {
         List<ClassDto> classes = classRepository.findAll().stream()
                 .map(classMapper)
@@ -117,13 +174,6 @@ public class ClassServiceImpl implements ClassService {
     @Override
     @Transactional
     public ResponseEntity<MessageResponse> createClass(String subjectName, MultipartFile classFile) throws IOException {
-//        var classObj = Class.builder()
-//                .className(classDto.className())
-//                .subject(subjectRepository.findBySubjectName(classDto.subject()).orElseThrow())
-//                .teacher(teacherRepository.findByTeacherName(classDto.teacherName()).get())
-//                .build();
-//        classRepository.save(classObj);
-//        return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponse("Thêm lớp học thành công"));
         Subject subject = subjectRepository.findBySubjectName(subjectName).orElseThrow();
 
         XSSFWorkbook workbook = new XSSFWorkbook(classFile.getInputStream());
@@ -131,6 +181,10 @@ public class ClassServiceImpl implements ClassService {
             XSSFSheet sheet = workbook.getSheetAt(i);
 
             String className = sheet.getSheetName();
+
+            if(classRepository.existBySubjectAndClassName(subject.getSubjectName(), className)){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponse("File chứa lớp học đã tồn tại. Vui lòng kiểm tra lại!"));
+            }
 
             String teacherCode = sheet.getRow(1).getCell(1).getStringCellValue().trim();
             Teacher teacher = teacherRepository.findByTeacherCode(teacherCode).orElseThrow();

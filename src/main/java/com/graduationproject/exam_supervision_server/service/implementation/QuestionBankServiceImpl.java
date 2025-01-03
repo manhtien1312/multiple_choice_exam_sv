@@ -115,7 +115,7 @@ public class QuestionBankServiceImpl implements QuestionBankService {
     // Đổ nội dung câu hỏi lên 1 dòng excel
     private void displayQuestionInExcel(XSSFSheet sheet, int rowIndex, CellStyle style, Question question){
         XSSFRow dataRow = sheet.createRow(rowIndex);
-        dataRow.createCell(0).setCellValue(question.getQuestionCode());
+        dataRow.createCell(0).setCellValue(question.getQuestionCode().substring(2));
 
         XSSFCell typeCell = dataRow.createCell(1);
         typeCell.setCellValue(question.getType().getTypeName());

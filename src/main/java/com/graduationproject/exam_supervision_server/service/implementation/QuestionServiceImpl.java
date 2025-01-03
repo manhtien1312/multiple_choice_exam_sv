@@ -102,6 +102,12 @@ public class QuestionServiceImpl implements QuestionService  {
     }
 
     @Override
+    public ResponseEntity<String> getNewestQuestionCode(String typeName, String questionBankId) {
+        String res = questionRepository.findNewestQuestionCode(typeName, UUID.fromString(questionBankId));
+        return ResponseEntity.status(HttpStatus.OK).body(res);
+    }
+
+    @Override
     @Transactional
     public ResponseEntity<MessageResponse> addQuestion(String questionBankId, String questionStr, MultipartFile questionImage) {
         try {
@@ -119,6 +125,11 @@ public class QuestionServiceImpl implements QuestionService  {
                 QuestionType savedType = questionTypeRepository.save(type);
                 question.setType(savedType);
             }
+
+            String questionCode = qb.get().getType() +
+                    "." +
+                    question.getQuestionCode();
+            question.setQuestionCode(questionCode);
 
             // Lưu hình ảnh của câu hỏi lên cloud và trả về url
             if(questionImage != null){

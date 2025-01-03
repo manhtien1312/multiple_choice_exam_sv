@@ -26,6 +26,17 @@ public interface QuestionRepository extends JpaRepository<Question, UUID> {
             "ORDER BY FUNCTION('RAND')")
     List<Question> findRandomQuestionsByType(String typeName, int level, UUID questionBankId, Pageable pageable);
 
+    @Query(value = """
+        SELECT q.question_code
+        FROM question q
+        JOIN question_type qt ON q.question_type_id = qt.id
+        WHERE qt.type_name = :typeName
+          AND q.question_bank_id = :questionBankId
+        ORDER BY CAST(SUBSTRING_INDEX(q.question_code, '.', -1) AS UNSIGNED) DESC
+        LIMIT 1
+        """, nativeQuery = true)
+    String findNewestQuestionCode(String typeName, UUID questionBankId);
+
 
     /* NV Ngọc sửa
      NM Tiến: Question không có trường subject nên hàm này không chạy được.
