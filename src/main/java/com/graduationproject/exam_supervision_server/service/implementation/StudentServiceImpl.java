@@ -120,8 +120,13 @@ public class StudentServiceImpl implements StudentService {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponse("Tồn tại dữ liệu khoa/ngành không chính xác. Vui lòng kiểm tra file dữ liệu!"));
                 }
 
+                String studentCode = row.getCell(1).getStringCellValue().trim();
+                if(studentRepository.existByStudentCode(studentCode)){
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponse("Tồn tại mã sinh viên trong hệ thống. Vui lòng kiểm tra lại!"));
+                }
+
                 var student = Student.builder()
-                        .studentCode(row.getCell(1).getStringCellValue().trim())
+                        .studentCode(studentCode)
                         .studentFullName(row.getCell(2).getStringCellValue().trim())
                         .studentFirstName(studentNameWords[studentNameWords.length-1])
                         .cohort(row.getCell(3).getStringCellValue())

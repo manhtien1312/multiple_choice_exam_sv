@@ -102,8 +102,12 @@ public class TeacherServiceImpl implements TeacherService {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponse("Tồn tại dữ liệu khoa/ngành không chính xác. Vui lòng kiểm tra file dữ liệu!"));
             }
             else {
+                String teacherCode = row.getCell(0).getStringCellValue().trim();
+                if(teacherRepository.existByTeacherCode(teacherCode)){
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponse("Mã giáo viên đã tồn tại. Vui lòng kiểm tra lại!"));
+                }
                 var teacher = Teacher.builder()
-                        .teacherCode(row.getCell(0).getStringCellValue().trim())
+                        .teacherCode(teacherCode)
                         .teacherName(row.getCell(1).getStringCellValue().trim())
                         .phoneNumber(row.getCell(2).getStringCellValue().trim())
                         .email(row.getCell(3).getStringCellValue().trim())
