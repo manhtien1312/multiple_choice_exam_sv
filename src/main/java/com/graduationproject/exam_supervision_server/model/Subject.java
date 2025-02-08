@@ -26,12 +26,27 @@ public class Subject {
     private String subjectCode;
     private String subjectName;
 
+    @ManyToMany
+    @JoinTable(
+            name = "major_subject",
+            joinColumns = @JoinColumn(name = "subject_id"),
+            inverseJoinColumns = @JoinColumn(name = "major_id")
+    )
+    private List<Major> majors;
+
     @OneToMany(
             mappedBy = "subject",
             cascade = CascadeType.ALL
     )
     @JsonIgnore
     private List<QuestionBank> questionBanks;
+
+    @OneToMany(
+            mappedBy = "subject",
+            cascade = CascadeType.ALL
+    )
+    @JsonIgnore
+    private List<QuestionType> types;
 
     @OneToMany(
             mappedBy = "subject",
@@ -46,5 +61,13 @@ public class Subject {
     )
     @JsonIgnore
     private List<Exam> exams;
+
+    @OneToMany(
+            mappedBy = "subject",
+            cascade = CascadeType.ALL
+    )
+    @JsonIgnore
+    private List<ExamQuestion> examQuestions;
+
 
 }

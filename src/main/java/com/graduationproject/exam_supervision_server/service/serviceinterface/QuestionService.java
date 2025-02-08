@@ -9,10 +9,13 @@ import java.util.List;
 
 public interface QuestionService {
 
+
     ResponseEntity<?>getQuestionById(String id);
-    ResponseEntity<MessageResponse> addQuestion(String questionBankId, Question question);
-    ResponseEntity<MessageResponse> addThroughFile(String questionBankId, MultipartFile questionFile);
-    ResponseEntity<MessageResponse> modifyQuestion(String id, Question question);
+    ResponseEntity<?> filterQuestion(String questionBankId, String typeName, int level, String searchText);
+    ResponseEntity<String> getNewestQuestionCode(String typeName, String questionBankId);
+    ResponseEntity<MessageResponse> addQuestion(String questionBankId, String questionStr, MultipartFile questionImage);
+    ResponseEntity<MessageResponse> addThroughFile(String subjectId, MultipartFile questionFile);
+    ResponseEntity<MessageResponse> modifyQuestion(String id, String questionStr, MultipartFile questionImage);
     ResponseEntity<MessageResponse> deleteQuestion(String id);
 
 

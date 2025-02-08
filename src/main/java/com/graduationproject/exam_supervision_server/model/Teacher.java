@@ -24,6 +24,12 @@ public class Teacher {
 
     private String teacherCode;
     private String teacherName;
+    private String phoneNumber;
+    private String email;
+
+    @ManyToOne
+    @JoinColumn(name = "major_id")
+    private Major major;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "account_id")
@@ -36,5 +42,12 @@ public class Teacher {
     )
     @JsonIgnore
     private List<Class> classes;
+
+    @OneToMany(
+            mappedBy = "createdBy",
+            cascade = CascadeType.ALL
+    )
+    @JsonIgnore
+    private List<ExamQuestion> examQuestions;
 
 }

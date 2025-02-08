@@ -13,7 +13,8 @@ public class SubjectMapper implements Function<Subject, SubjectDto> {
         return new SubjectDto(
                 subject.getId(),
                 subject.getSubjectCode(),
-                subject.getSubjectName()
+                subject.getSubjectName(),
+                null
         );
     }
 }

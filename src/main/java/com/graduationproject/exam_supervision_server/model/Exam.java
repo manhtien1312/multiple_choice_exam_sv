@@ -27,26 +27,19 @@ public class Exam {
 
     @ManyToOne
     @JoinColumn(name = "subject_id")
+    @JsonIgnore
     private Subject subject;
 
     @ManyToOne
     @JoinColumn(name = "class_id")
     private Class classBelonged;
 
-    @OneToOne
-    @JoinColumn(name = "exam_question_id")
-    private ExamQuestion examQuestion;
-
     private LocalDateTime timeStart;
     private LocalDateTime timeEnd;
 
-    @ManyToMany
-    @JoinTable(
-            name = "exam_student",
-            joinColumns = @JoinColumn(name = "exam_id"),
-            inverseJoinColumns = @JoinColumn(name = "student_id")
-    )
-    private List<Student> allowedStudents;
+    @OneToMany(mappedBy = "exam")
+    @JsonIgnore
+    private List<ExamStudent> examStudents;
 
     @OneToMany(mappedBy = "exam")
     @JsonIgnore

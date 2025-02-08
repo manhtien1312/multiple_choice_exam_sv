@@ -21,19 +21,42 @@ public class QuestionController {
         return questionService.getQuestionById(id);
     }
 
+    @GetMapping("/filter")
+    public ResponseEntity<?> filterQuestion(
+            @RequestParam String questionBankId,
+            @RequestParam(required = false) String typeName,
+            @RequestParam(required = false) Integer level,
+            @RequestParam(required = false) String searchText
+    ){
+        return questionService.filterQuestion(questionBankId, typeName, level, searchText);
+    }
+
+    @GetMapping("/newest-questionCode")
+    public ResponseEntity<String> getNewestQuestionCode(@RequestParam String typeName, @RequestParam String questionBankId){
+        return questionService.getNewestQuestionCode(typeName, questionBankId);
+    }
+
     @PostMapping
-    public ResponseEntity<MessageResponse> addQuestion(@RequestParam String questionBankId, @RequestBody Question question){
-        return questionService.addQuestion(questionBankId, question);
+    public ResponseEntity<MessageResponse> addQuestion(
+            @RequestParam String questionBankId,
+            @RequestParam String questionStr,
+            @RequestParam(required = false) MultipartFile questionImage
+    ){
+        return questionService.addQuestion(questionBankId, questionStr, questionImage);
     }
 
     @PostMapping("/add-file")
-    public ResponseEntity<MessageResponse> addThroughFile(@RequestParam String questionBankId, @RequestParam MultipartFile questionFile){
-        return questionService.addThroughFile(questionBankId, questionFile);
+    public ResponseEntity<MessageResponse> addThroughFile(@RequestParam String subjectId, @RequestParam MultipartFile questionFile){
+        return questionService.addThroughFile(subjectId, questionFile);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<MessageResponse> modifyQuestion(@PathVariable String id, @RequestBody Question question){
-        return questionService.modifyQuestion(id, question);
+    public ResponseEntity<MessageResponse> modifyQuestion(
+            @PathVariable String id,
+            @RequestParam String questionStr,
+            @RequestParam(required = false) MultipartFile questionImage
+    ){
+        return questionService.modifyQuestion(id, questionStr, questionImage);
     }
 
     @DeleteMapping("/{id}")

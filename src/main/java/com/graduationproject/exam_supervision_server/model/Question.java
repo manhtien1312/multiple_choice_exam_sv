@@ -22,10 +22,17 @@ public class Question {
     @GeneratedValue
     private UUID id;
 
-    private Integer type;
+    @ManyToOne
+    @JoinColumn(name = "question_type_id")
+    private QuestionType type;
+
+    private String questionCode;
+    private Integer level;
 
     @Column(columnDefinition = "TEXT")
     private String questionContent;
+
+    private String imageUrl;
 
     @OneToMany(
             mappedBy = "question",
